@@ -8,6 +8,12 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import com.github.angads25.filepicker.controller.DialogSelectionListener;
+import com.github.angads25.filepicker.model.DialogConfigs;
+import com.github.angads25.filepicker.model.DialogProperties;
+import com.github.angads25.filepicker.view.FilePickerDialog;
+
+import java.io.File;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -22,8 +28,20 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                DialogProperties properties=new DialogProperties();
+                properties.selection_mode=DialogConfigs.SINGLE_MODE;
+                properties.selection_type=DialogConfigs.FILE_SELECT;
+                properties.root=new File(DialogConfigs.DEFAULT_DIR);
+                properties.extensions=null;
+
+                FilePickerDialog dialog = new FilePickerDialog(MainActivity.this,properties);
+                dialog.setDialogSelectionListener(new DialogSelectionListener() {
+                    @Override
+                    public void onSelectedFilePaths(String[] files) {
+                        //files is the array of the paths of files selected by the Application User.
+                    }
+                });
+                dialog.show();
             }
         });
     }
