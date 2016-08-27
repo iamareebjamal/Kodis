@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
                 dialog.setDialogSelectionListener(new DialogSelectionListener() {
                     @Override
                     public void onSelectedFilePaths(String[] files) {
-                        //files is the array of the paths of files selected by the Application User.
+                        Toast.makeText(getApplicationContext(), files[0], Toast.LENGTH_SHORT).show();
                     }
                 });
                 dialog.show();
