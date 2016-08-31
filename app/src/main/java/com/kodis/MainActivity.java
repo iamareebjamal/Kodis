@@ -1,5 +1,7 @@
 package com.kodis;
 
+import android.content.res.Resources;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -8,15 +10,17 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.github.angads25.filepicker.controller.DialogSelectionListener;
 import com.github.angads25.filepicker.model.DialogConfigs;
 import com.github.angads25.filepicker.model.DialogProperties;
 import com.github.angads25.filepicker.view.FilePickerDialog;
 
-import java.io.File;
+import java.io.*;
 
 public class MainActivity extends AppCompatActivity {
+    private String title;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,24 +29,32 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        setInitialFAB();
+    }
+
+    private void openFilePicker() {
+        DialogProperties properties=new DialogProperties();
+        properties.selection_mode=DialogConfigs.SINGLE_MODE;
+        properties.selection_type=DialogConfigs.FILE_SELECT;
+        properties.root=new File(DialogConfigs.DEFAULT_DIR);
+        properties.extensions=new String[]{".txt"};
+
+        FilePickerDialog dialog = new FilePickerDialog(MainActivity.this,properties);
+        dialog.setDialogSelectionListener(new DialogSelectionListener() {
+            @Override
+            public void onSelectedFilePaths(String[] files) {
+                new DocumentLoader().execute(files);
+            }
+        });
+        dialog.show();
+    }
+
+    private void setInitialFAB(){
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DialogProperties properties=new DialogProperties();
-                properties.selection_mode=DialogConfigs.SINGLE_MODE;
-                properties.selection_type=DialogConfigs.FILE_SELECT;
-                properties.root=new File(DialogConfigs.DEFAULT_DIR);
-                properties.extensions=null;
-
-                FilePickerDialog dialog = new FilePickerDialog(MainActivity.this,properties);
-                dialog.setDialogSelectionListener(new DialogSelectionListener() {
-                    @Override
-                    public void onSelectedFilePaths(String[] files) {
-                        Toast.makeText(getApplicationContext(), files[0], Toast.LENGTH_SHORT).show();
-                    }
-                });
-                dialog.show();
+                openFilePicker();
             }
         });
         fab.setOnLongClickListener(new View.OnLongClickListener() {
@@ -52,6 +64,12 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
+    }
+
+    private void loadDocument(String fileContent) {
+        TextView textView = (TextView) findViewById(R.id.fileContent);
+        textView.setText(fileContent);
+        getSupportActionBar().setTitle(title);
     }
 
     @Override
@@ -74,5 +92,41 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private class DocumentLoader extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String... paths) {
+
+            try {
+                title = new File(paths[0]).getName();
+                BufferedReader br = new BufferedReader(new FileReader(paths[0]));
+                try {
+                    StringBuilder sb = new StringBuilder();
+                    String line = br.readLine();
+
+                    while (line != null) {
+                        sb.append(line);
+                        sb.append("\n");
+                        line = br.readLine();
+                    }
+                    String everything = sb.toString();
+                    return everything;
+                } catch (IOException ioe){
+
+                } finally {
+                    try {
+                        br.close();
+                    } catch (IOException ioe) {}
+                }
+            } catch (FileNotFoundException fnfe) {}
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            loadDocument(s);
+        }
     }
 }

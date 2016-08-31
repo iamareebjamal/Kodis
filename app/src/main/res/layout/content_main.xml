@@ -14,6 +14,7 @@
         tools:context="com.kodis.MainActivity">
 
     <TextView
+            android:id="@+id/fileContent"
             android:text="Welcome to Kodis!"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
