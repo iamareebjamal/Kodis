@@ -13,9 +13,50 @@
         tools:showIn="@layout/activity_main"
         tools:context="com.kodis.MainActivity">
 
-    <TextView
-            android:id="@+id/fileContent"
-            android:text="Welcome to Kodis!"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+    <RelativeLayout
+            android:id="@+id/hidden"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:visibility="gone"
+            android:padding="30dp">
+
+        <ProgressBar
+                android:id="@+id/progress"
+                style="@style/Widget.AppCompat.ProgressBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"/>
+
+        <ImageView
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:id="@+id/empty"
+                android:layout_centerHorizontal="true"
+                app:srcCompat="@drawable/vector_open"
+                tools:ignore="MissingPrefix"/>
+
+        <TextView
+                android:id="@+id/loadingMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/empty"
+                android:layout_centerHorizontal="true"
+                android:padding="4dp"
+                android:textStyle="italic"
+                android:textSize="20sp"
+                android:text="Loading File..."/>
+    </RelativeLayout>
+
+    <com.kodis.InteractiveScrollView
+            android:id="@+id/scrollView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        <TextView
+                android:id="@+id/fileContent"
+                android:text="Welcome to Kodis!"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+    </com.kodis.InteractiveScrollView>
 </RelativeLayout>

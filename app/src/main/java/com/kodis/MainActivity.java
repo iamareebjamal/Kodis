@@ -3,15 +3,18 @@ package com.kodis;
 import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.view.ScrollingView;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.*;
 import com.github.angads25.filepicker.controller.DialogSelectionListener;
 import com.github.angads25.filepicker.model.DialogConfigs;
 import com.github.angads25.filepicker.model.DialogProperties;
@@ -21,6 +24,7 @@ import java.io.*;
 
 public class MainActivity extends AppCompatActivity {
     private String title;
+    private int cursor = 10000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,12 +41,14 @@ public class MainActivity extends AppCompatActivity {
         properties.selection_mode=DialogConfigs.SINGLE_MODE;
         properties.selection_type=DialogConfigs.FILE_SELECT;
         properties.root=new File(DialogConfigs.DEFAULT_DIR);
-        properties.extensions=new String[]{".txt"};
+        properties.extensions=new String[]{".txt", ".c", ".java", ".py", ".cpp", ".html"};
 
         FilePickerDialog dialog = new FilePickerDialog(MainActivity.this,properties);
         dialog.setDialogSelectionListener(new DialogSelectionListener() {
             @Override
             public void onSelectedFilePaths(String[] files) {
+                RelativeLayout hidden = (RelativeLayout) findViewById(R.id.hidden);
+                hidden.setVisibility(View.VISIBLE);
                 new DocumentLoader().execute(files);
             }
         });
@@ -66,10 +72,39 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void loadDocument(String fileContent) {
-        TextView textView = (TextView) findViewById(R.id.fileContent);
-        textView.setText(fileContent);
+    private void loadDocument(final String fileContent) {
+        final TextView textView = (TextView) findViewById(R.id.fileContent);
+        final RelativeLayout hidden = (RelativeLayout) findViewById(R.id.hidden);
+
+        final InteractiveScrollView scrollView = (InteractiveScrollView) findViewById(R.id.scrollView);
+        scrollView.setVerticalScrollBarEnabled(true);
+
+        if(fileContent.length()>10000) {
+            textView.setText(fileContent.substring(0, 10000));
+            scrollView.setOnBottomReachedListener(new InteractiveScrollView.OnBottomReachedListener() {
+                @Override
+                public void onBottomReached() {
+                    if(cursor>=fileContent.length())
+                        return;
+                    else if(cursor+10000 > fileContent.length())
+                        textView.append(fileContent.substring(cursor+1, fileContent.length()));
+                    else
+                        textView.append(fileContent.substring(cursor+1, cursor+10000));
+
+                    cursor+=10000;
+                }
+            });
+
+
+        } else {
+            textView.setText(fileContent);
+        }
+
         getSupportActionBar().setTitle(title);
+
+        hidden.setVisibility(View.GONE);
+
+
     }
 
     @Override
@@ -95,6 +130,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private class DocumentLoader extends AsyncTask<String, Void, String> {
+
         @Override
         protected String doInBackground(String... paths) {
 
@@ -126,6 +162,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String s) {
+            Toast.makeText(getApplicationContext(), "got", Toast.LENGTH_SHORT).show();
             loadDocument(s);
         }
     }
