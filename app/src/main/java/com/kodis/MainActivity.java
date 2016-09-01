@@ -11,7 +11,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 import com.github.angads25.filepicker.controller.DialogSelectionListener;
 import com.github.angads25.filepicker.model.DialogConfigs;
@@ -28,6 +27,8 @@ public class MainActivity extends AppCompatActivity {
     private StringBuilder loaded;
 
     private FloatingActionButton fab;
+    private EditText contentView;
+    private RelativeLayout hidden;
 
 
     @Override
@@ -37,6 +38,8 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        contentView = (EditText) findViewById(R.id.fileContent);
+        hidden = (RelativeLayout) findViewById(R.id.hidden);
         setInitialFAB();
     }
 
@@ -51,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
         dialog.setDialogSelectionListener(new DialogSelectionListener() {
             @Override
             public void onSelectedFilePaths(String[] files) {
-                RelativeLayout hidden = (RelativeLayout) findViewById(R.id.hidden);
+                contentView.setVisibility(View.GONE);
                 hidden.setVisibility(View.VISIBLE);
                 new DocumentLoader().execute(files);
             }
@@ -77,15 +80,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loadDocument(final String fileContent) {
-        final EditText textView = (EditText) findViewById(R.id.fileContent);
-        final RelativeLayout hidden = (RelativeLayout) findViewById(R.id.hidden);
 
         final InteractiveScrollView scrollView = (InteractiveScrollView) findViewById(R.id.scrollView);
         scrollView.setOnBottomReachedListener(null);
         scrollView.setOnScrollListener(new InteractiveScrollView.OnScrollListener() {
             @Override
             public void onScrolled() {
-                textView.setFocusable(false);
+                contentView.setFocusable(false);
             }
 
             @Override
@@ -101,31 +102,31 @@ public class MainActivity extends AppCompatActivity {
         });
         scrollView.smoothScrollTo(0, 0);
 
-        textView.setFocusable(false);
-        textView.setOnClickListener(new View.OnClickListener() {
+        contentView.setFocusable(false);
+        contentView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                textView.setFocusableInTouchMode(true);
+                contentView.setFocusableInTouchMode(true);
             }
         });
 
         loaded = new StringBuilder();
         cursor = CHUNK;
         if (fileContent.length() > CHUNK)
-            loadInChunks(textView, scrollView, fileContent);
+            loadInChunks(scrollView, fileContent);
         else {
             loaded.append(fileContent);
-            textView.setText(loaded);
+            contentView.setText(loaded);
         }
 
         getSupportActionBar().setTitle(title);
 
         hidden.setVisibility(View.GONE);
-
+        contentView.setVisibility(View.VISIBLE);
     }
 
-    private void loadInChunks(final TextView textView, InteractiveScrollView scrollView, final String bigString) {
-        textView.setText(bigString.substring(0, CHUNK));
+    private void loadInChunks(InteractiveScrollView scrollView, final String bigString) {
+        contentView.setText(bigString.substring(0, CHUNK));
         scrollView.setOnBottomReachedListener(new InteractiveScrollView.OnBottomReachedListener() {
             @Override
             public void onBottomReached() {
@@ -143,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 Log.d("TEXT", "Updated");
-                textView.setText(loaded);
+                contentView.setText(loaded);
             }
         });
     }
