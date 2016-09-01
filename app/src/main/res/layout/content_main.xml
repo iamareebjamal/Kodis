@@ -53,10 +53,12 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-        <TextView
+        <EditText
                 android:id="@+id/fileContent"
                 android:text="Welcome to Kodis!"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:background="@android:color/transparent"
+                android:focusable="false"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
     </com.kodis.InteractiveScrollView>
 </RelativeLayout>

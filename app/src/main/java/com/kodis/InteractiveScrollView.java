@@ -6,7 +6,8 @@ import android.view.View;
 import android.widget.ScrollView;
 
 public class InteractiveScrollView extends ScrollView {
-    OnBottomReachedListener mListener;
+    OnBottomReachedListener onBottomReachedListener;
+    OnScrollListener onScrollListener;
 
     public InteractiveScrollView(Context context, AttributeSet attrs,
                                  int defStyle) {
@@ -23,34 +24,48 @@ public class InteractiveScrollView extends ScrollView {
 
     @Override
     protected void onScrollChanged(int l, int t, int oldl, int oldt) {
-        View view = (View) getChildAt(getChildCount() - 1);
+        onScrollListener.onScrolled();
+
+        if(t>oldt)
+            onScrollListener.onScrolledDown();
+        else
+            onScrollListener.onScrolledUp();
+
+        View view = getChildAt(getChildCount() - 1);
         int diff = (view.getBottom() - (getHeight() + getScrollY()));
 
-        if (diff <= 20 && mListener != null) {
-            mListener.onBottomReached();
+        if (diff <= 20 && onBottomReachedListener != null) {
+            onBottomReachedListener.onBottomReached();
         }
 
         super.onScrollChanged(l, t, oldl, oldt);
     }
 
-
-    // Getters & Setters
-
     public OnBottomReachedListener getOnBottomReachedListener() {
-        return mListener;
+        return onBottomReachedListener;
     }
 
     public void setOnBottomReachedListener(
             OnBottomReachedListener onBottomReachedListener) {
-        mListener = onBottomReachedListener;
+        this.onBottomReachedListener = onBottomReachedListener;
     }
 
+    public OnScrollListener getOnScrollListener() {
+        return onScrollListener;
+    }
 
-    /**
-     * Event listener.
-     */
+    public void setOnScrollListener(OnScrollListener onScrollListener) {
+        this.onScrollListener = onScrollListener;
+    }
+
     public interface OnBottomReachedListener {
-        public void onBottomReached();
+        void onBottomReached();
+    }
+
+    public interface OnScrollListener {
+        void onScrolled();
+        void onScrolledUp();
+        void onScrolledDown();
     }
 
 }

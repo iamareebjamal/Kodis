@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,8 +25,10 @@ public class MainActivity extends AppCompatActivity {
 
     private int CHUNK = 20000;
     private int cursor;
-
     private StringBuilder loaded;
+
+    private FloatingActionButton fab;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
         properties.selection_mode = DialogConfigs.SINGLE_MODE;
         properties.selection_type = DialogConfigs.FILE_SELECT;
         properties.root = new File(DialogConfigs.DEFAULT_DIR);
-        properties.extensions = new String[]{".txt", ".c", ".java", ".py", ".cpp", ".html"};
+        properties.extensions = null;
 
         FilePickerDialog dialog = new FilePickerDialog(MainActivity.this, properties);
         dialog.setDialogSelectionListener(new DialogSelectionListener() {
@@ -57,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setInitialFAB() {
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -74,12 +77,37 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loadDocument(final String fileContent) {
-        final TextView textView = (TextView) findViewById(R.id.fileContent);
+        final EditText textView = (EditText) findViewById(R.id.fileContent);
         final RelativeLayout hidden = (RelativeLayout) findViewById(R.id.hidden);
 
         final InteractiveScrollView scrollView = (InteractiveScrollView) findViewById(R.id.scrollView);
         scrollView.setOnBottomReachedListener(null);
-        scrollView.setVerticalScrollBarEnabled(true);
+        scrollView.setOnScrollListener(new InteractiveScrollView.OnScrollListener() {
+            @Override
+            public void onScrolled() {
+                textView.setFocusable(false);
+            }
+
+            @Override
+            public void onScrolledUp() {
+                fab.show();
+
+            }
+
+            @Override
+            public void onScrolledDown() {
+                fab.hide();
+            }
+        });
+        scrollView.smoothScrollTo(0, 0);
+
+        textView.setFocusable(false);
+        textView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                textView.setFocusableInTouchMode(true);
+            }
+        });
 
         loaded = new StringBuilder();
         cursor = CHUNK;
@@ -104,17 +132,18 @@ public class MainActivity extends AppCompatActivity {
                 if (cursor >= bigString.length())
                     return;
                 else if (cursor + CHUNK > bigString.length()) {
-                    String buffer = bigString.substring(cursor + 1, bigString.length());
-                    textView.append(buffer);
+                    String buffer = bigString.substring(cursor, bigString.length());
                     loaded.append(buffer);
                     cursor = bigString.length();
                 } else {
-                    String buffer = bigString.substring(cursor + 1, cursor + CHUNK);
-                    textView.append(buffer);
+                    String buffer = bigString.substring(cursor, cursor + CHUNK);
                     loaded.append(buffer);
-                    Log.d("CHUNK", String.valueOf(CHUNK));
                     cursor += CHUNK;
+
                 }
+
+                Log.d("TEXT", "Updated");
+                textView.setText(loaded);
             }
         });
     }
@@ -176,7 +205,6 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String s) {
-            Toast.makeText(getApplicationContext(), "got", Toast.LENGTH_SHORT).show();
             loadDocument(s);
         }
     }
