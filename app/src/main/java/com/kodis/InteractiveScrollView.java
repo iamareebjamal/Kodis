@@ -23,8 +23,8 @@ public class InteractiveScrollView extends ScrollView {
 
     @Override
     protected void onScrollChanged(int l, int t, int oldl, int oldt) {
-        View view = (View) getChildAt(getChildCount()-1);
-        int diff = (view.getBottom()-(getHeight()+getScrollY()));
+        View view = (View) getChildAt(getChildCount() - 1);
+        int diff = (view.getBottom() - (getHeight() + getScrollY()));
 
         if (diff <= 20 && mListener != null) {
             mListener.onBottomReached();
@@ -49,7 +49,7 @@ public class InteractiveScrollView extends ScrollView {
     /**
      * Event listener.
      */
-    public interface OnBottomReachedListener{
+    public interface OnBottomReachedListener {
         public void onBottomReached();
     }
 

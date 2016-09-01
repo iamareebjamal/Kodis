@@ -1,20 +1,17 @@
 package com.kodis;
 
-import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.view.ScrollingView;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.*;
+import android.view.View;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 import com.github.angads25.filepicker.controller.DialogSelectionListener;
 import com.github.angads25.filepicker.model.DialogConfigs;
 import com.github.angads25.filepicker.model.DialogProperties;
@@ -24,7 +21,11 @@ import java.io.*;
 
 public class MainActivity extends AppCompatActivity {
     private String title;
-    private int cursor = 10000;
+
+    private int CHUNK = 20000;
+    private int cursor;
+
+    private StringBuilder loaded;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,13 +38,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void openFilePicker() {
-        DialogProperties properties=new DialogProperties();
-        properties.selection_mode=DialogConfigs.SINGLE_MODE;
-        properties.selection_type=DialogConfigs.FILE_SELECT;
-        properties.root=new File(DialogConfigs.DEFAULT_DIR);
-        properties.extensions=new String[]{".txt", ".c", ".java", ".py", ".cpp", ".html"};
+        DialogProperties properties = new DialogProperties();
+        properties.selection_mode = DialogConfigs.SINGLE_MODE;
+        properties.selection_type = DialogConfigs.FILE_SELECT;
+        properties.root = new File(DialogConfigs.DEFAULT_DIR);
+        properties.extensions = new String[]{".txt", ".c", ".java", ".py", ".cpp", ".html"};
 
-        FilePickerDialog dialog = new FilePickerDialog(MainActivity.this,properties);
+        FilePickerDialog dialog = new FilePickerDialog(MainActivity.this, properties);
         dialog.setDialogSelectionListener(new DialogSelectionListener() {
             @Override
             public void onSelectedFilePaths(String[] files) {
@@ -55,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
         dialog.show();
     }
 
-    private void setInitialFAB(){
+    private void setInitialFAB() {
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -77,34 +78,45 @@ public class MainActivity extends AppCompatActivity {
         final RelativeLayout hidden = (RelativeLayout) findViewById(R.id.hidden);
 
         final InteractiveScrollView scrollView = (InteractiveScrollView) findViewById(R.id.scrollView);
+        scrollView.setOnBottomReachedListener(null);
         scrollView.setVerticalScrollBarEnabled(true);
 
-        if(fileContent.length()>10000) {
-            textView.setText(fileContent.substring(0, 10000));
-            scrollView.setOnBottomReachedListener(new InteractiveScrollView.OnBottomReachedListener() {
-                @Override
-                public void onBottomReached() {
-                    if(cursor>=fileContent.length())
-                        return;
-                    else if(cursor+10000 > fileContent.length())
-                        textView.append(fileContent.substring(cursor+1, fileContent.length()));
-                    else
-                        textView.append(fileContent.substring(cursor+1, cursor+10000));
-
-                    cursor+=10000;
-                }
-            });
-
-
-        } else {
-            textView.setText(fileContent);
+        loaded = new StringBuilder();
+        cursor = CHUNK;
+        if (fileContent.length() > CHUNK)
+            loadInChunks(textView, scrollView, fileContent);
+        else {
+            loaded.append(fileContent);
+            textView.setText(loaded);
         }
 
         getSupportActionBar().setTitle(title);
 
         hidden.setVisibility(View.GONE);
 
+    }
 
+    private void loadInChunks(final TextView textView, InteractiveScrollView scrollView, final String bigString) {
+        textView.setText(bigString.substring(0, CHUNK));
+        scrollView.setOnBottomReachedListener(new InteractiveScrollView.OnBottomReachedListener() {
+            @Override
+            public void onBottomReached() {
+                if (cursor >= bigString.length())
+                    return;
+                else if (cursor + CHUNK > bigString.length()) {
+                    String buffer = bigString.substring(cursor + 1, bigString.length());
+                    textView.append(buffer);
+                    loaded.append(buffer);
+                    cursor = bigString.length();
+                } else {
+                    String buffer = bigString.substring(cursor + 1, cursor + CHUNK);
+                    textView.append(buffer);
+                    loaded.append(buffer);
+                    Log.d("CHUNK", String.valueOf(CHUNK));
+                    cursor += CHUNK;
+                }
+            }
+        });
     }
 
     @Override
@@ -148,14 +160,16 @@ public class MainActivity extends AppCompatActivity {
                     }
                     String everything = sb.toString();
                     return everything;
-                } catch (IOException ioe){
+                } catch (IOException ioe) {
 
                 } finally {
                     try {
                         br.close();
-                    } catch (IOException ioe) {}
+                    } catch (IOException ioe) {
+                    }
                 }
-            } catch (FileNotFoundException fnfe) {}
+            } catch (FileNotFoundException fnfe) {
+            }
 
             return null;
         }
