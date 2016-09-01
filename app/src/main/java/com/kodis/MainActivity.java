@@ -6,6 +6,8 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -20,11 +22,12 @@ import com.github.angads25.filepicker.view.FilePickerDialog;
 
 import java.io.*;
 
-public class MainActivity extends AppCompatActivity {
-    private String title;
+public class MainActivity extends AppCompatActivity implements TextWatcher {
+    private File file;
 
     private int CHUNK = 20000;
-    private int cursor;
+    private String FILE_CONTENT;
+    private String currentBuffer;
     private StringBuilder loaded;
 
     private FloatingActionButton fab;
@@ -42,6 +45,8 @@ public class MainActivity extends AppCompatActivity {
         contentView = (EditText) findViewById(R.id.fileContent);
         hidden = (RelativeLayout) findViewById(R.id.hidden);
         setInitialFAB();
+
+        PermissionManager.verifyStoragePermissions(this);
     }
 
     private void openFilePicker() {
@@ -65,6 +70,31 @@ public class MainActivity extends AppCompatActivity {
 
     private void setInitialFAB() {
         fab = (FloatingActionButton) findViewById(R.id.fab);
+        setOpenFAB();
+    }
+
+    private void setSaveFAB(){
+        fab.setImageResource(R.drawable.vector_save);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(isChanged()) {
+                    new DocumentSaver().execute();
+                } else
+                    Toast.makeText(getApplicationContext(), "No change in file", Toast.LENGTH_SHORT).show();
+            }
+        });
+        fab.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                Toast.makeText(getApplicationContext(), "Save File", Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        });
+    }
+
+    private void setOpenFAB(){
+        fab.setImageResource(R.drawable.vector_open);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -82,6 +112,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void loadDocument(final String fileContent) {
 
+        ActionBar supportActionBar = getSupportActionBar();
+        if(supportActionBar!=null)
+            getSupportActionBar().setTitle(file.getName());
+
         final InteractiveScrollView scrollView = (InteractiveScrollView) findViewById(R.id.scrollView);
         scrollView.setOnBottomReachedListener(null);
         scrollView.setOnScrollListener(new InteractiveScrollView.OnScrollListener() {
@@ -93,7 +127,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onScrolledUp() {
                 fab.show();
-
             }
 
             @Override
@@ -112,7 +145,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         loaded = new StringBuilder();
-        cursor = CHUNK;
         if (fileContent.length() > CHUNK)
             loadInChunks(scrollView, fileContent);
         else {
@@ -120,30 +152,36 @@ public class MainActivity extends AppCompatActivity {
             contentView.setText(loaded);
         }
 
-        ActionBar supportActionBar = getSupportActionBar();
-        if(supportActionBar!=null)
-            getSupportActionBar().setTitle(title);
 
         hidden.setVisibility(View.GONE);
         contentView.setVisibility(View.VISIBLE);
+        contentView.addTextChangedListener(this);
+        currentBuffer = contentView.getText().toString();
+    }
+
+    private boolean isChanged(){
+        if(FILE_CONTENT.length() >= CHUNK && FILE_CONTENT.substring(0, loaded.length()).equals(currentBuffer))
+            return false;
+        else if(FILE_CONTENT.equals(currentBuffer))
+            return false;
+
+        return true;
     }
 
     private void loadInChunks(InteractiveScrollView scrollView, final String bigString) {
-        contentView.setText(bigString.substring(0, CHUNK));
+        loaded.append(bigString.substring(0, CHUNK));
+        contentView.setText(loaded);
         scrollView.setOnBottomReachedListener(new InteractiveScrollView.OnBottomReachedListener() {
             @Override
             public void onBottomReached() {
-                if (cursor >= bigString.length())
+                if (loaded.length() >= bigString.length())
                     return;
-                else if (cursor + CHUNK > bigString.length()) {
-                    String buffer = bigString.substring(cursor, bigString.length());
+                else if (loaded.length() + CHUNK > bigString.length()) {
+                    String buffer = bigString.substring(loaded.length(), bigString.length());
                     loaded.append(buffer);
-                    cursor = bigString.length();
                 } else {
-                    String buffer = bigString.substring(cursor, cursor + CHUNK);
+                    String buffer = bigString.substring(loaded.length(), loaded.length() + CHUNK);
                     loaded.append(buffer);
-                    cursor += CHUNK;
-
                 }
 
                 Log.d("TEXT", "Updated");
@@ -174,13 +212,32 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+        currentBuffer = contentView.getText().toString();
+        if(isChanged())
+            setSaveFAB();
+        else
+            setOpenFAB();
+    }
+
+    @Override
+    public void afterTextChanged(Editable editable) {
+
+    }
+
     private class DocumentLoader extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... paths) {
 
             try {
-                title = new File(paths[0]).getName();
+                file = new File(paths[0]);
                 BufferedReader br = new BufferedReader(new FileReader(paths[0]));
                 try {
                     StringBuilder sb = new StringBuilder();
@@ -191,7 +248,8 @@ public class MainActivity extends AppCompatActivity {
                         sb.append("\n");
                         line = br.readLine();
                     }
-                    return sb.toString();
+                    FILE_CONTENT = sb.toString();
+                    return FILE_CONTENT;
                 } catch (IOException ioe) {
                 } finally {
                     try {
@@ -206,6 +264,38 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String s) {
             loadDocument(s);
+        }
+    }
+
+    private class DocumentSaver extends AsyncTask<Void, Void, Void>{
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            BufferedWriter output = null;
+            try {
+                output = new BufferedWriter(new FileWriter(file));
+                if(FILE_CONTENT.length() < CHUNK) {
+                    output.write(currentBuffer);
+                } else {
+                    output.write(currentBuffer + FILE_CONTENT.substring(loaded.length(), FILE_CONTENT.length()));
+                }
+            } catch ( IOException e ) {
+                e.printStackTrace();
+            } finally {
+                if ( output != null ) {
+                    try {
+                        output.close();
+                    } catch (IOException ioe) {}
+                }
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void v) {
+            Toast.makeText(getApplicationContext(), "Saved", Toast.LENGTH_SHORT).show();
+            setOpenFAB();
         }
     }
 }
