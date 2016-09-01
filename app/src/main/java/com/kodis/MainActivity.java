@@ -3,6 +3,7 @@ package com.kodis;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -119,7 +120,9 @@ public class MainActivity extends AppCompatActivity {
             contentView.setText(loaded);
         }
 
-        getSupportActionBar().setTitle(title);
+        ActionBar supportActionBar = getSupportActionBar();
+        if(supportActionBar!=null)
+            getSupportActionBar().setTitle(title);
 
         hidden.setVisibility(View.GONE);
         contentView.setVisibility(View.VISIBLE);
@@ -188,18 +191,14 @@ public class MainActivity extends AppCompatActivity {
                         sb.append("\n");
                         line = br.readLine();
                     }
-                    String everything = sb.toString();
-                    return everything;
+                    return sb.toString();
                 } catch (IOException ioe) {
-
                 } finally {
                     try {
                         br.close();
-                    } catch (IOException ioe) {
-                    }
+                    } catch (IOException ioe) {}
                 }
-            } catch (FileNotFoundException fnfe) {
-            }
+            } catch (FileNotFoundException fnfe) {}
 
             return null;
         }
