@@ -29,9 +29,27 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+    <LinearLayout
+            android:id="@+id/intro"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_gravity="center">
+
+        <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/kodis"/>
+
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textStyle="italic"
+                android:textSize="30sp"
+                android:text="Kodis"/>
+    </LinearLayout>
+
 
     <android.support.v4.view.ViewPager
             android:id="@+id/viewpager"

@@ -129,6 +129,7 @@ public class MainFragment extends Fragment implements FileChangeListener, OnScro
         dialog.setDialogSelectionListener(new DialogSelectionListener() {
             @Override
             public void onSelectedFilePaths(String[] files) {
+                ((AppCompatActivity)getActivity()).getSupportActionBar().hide();
                 addTab(files[0]);
             }
         });
@@ -139,7 +140,7 @@ public class MainFragment extends Fragment implements FileChangeListener, OnScro
     @Override
     public void onFileOpen() {
         tabLayout.setVisibility(View.VISIBLE);
-        ((AppCompatActivity)getActivity()).getSupportActionBar().hide();
+        rootView.findViewById(R.id.intro).setVisibility(View.GONE);
     }
 
     @Override
