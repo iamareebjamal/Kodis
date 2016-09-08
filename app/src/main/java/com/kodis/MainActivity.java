@@ -272,19 +272,20 @@ public class MainActivity extends AppCompatActivity implements TextWatcher {
         @Override
         protected Void doInBackground(Void... voids) {
             BufferedWriter output = null;
+            String toSave = currentBuffer;
             try {
                 output = new BufferedWriter(new FileWriter(file));
-                if(FILE_CONTENT.length() < CHUNK) {
-                    output.write(currentBuffer);
-                } else {
-                    output.write(currentBuffer + FILE_CONTENT.substring(loaded.length(), FILE_CONTENT.length()));
+                if(FILE_CONTENT.length() > CHUNK) {
+                    toSave = currentBuffer + FILE_CONTENT.substring(loaded.length(), FILE_CONTENT.length());
                 }
+                output.write(toSave);
             } catch ( IOException e ) {
                 e.printStackTrace();
             } finally {
                 if ( output != null ) {
                     try {
                         output.close();
+                        FILE_CONTENT = toSave;
                     } catch (IOException ioe) {}
                 }
             }
