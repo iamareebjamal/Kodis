@@ -46,7 +46,6 @@ public class MainFragment extends Fragment implements FileChangeListener, OnScro
         Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.toolbar);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
 
-
         setInitialFAB();
 
         viewPager = (ViewPager) rootView.findViewById(R.id.viewpager);
@@ -140,6 +139,7 @@ public class MainFragment extends Fragment implements FileChangeListener, OnScro
     @Override
     public void onFileOpen() {
         tabLayout.setVisibility(View.VISIBLE);
+        ((AppCompatActivity)getActivity()).getSupportActionBar().hide();
     }
 
     @Override
