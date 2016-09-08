@@ -21,7 +21,7 @@ import com.kodis.listener.OnScrollListener;
 import com.kodis.ui.adapder.ViewPagerAdapter;
 import com.kodis.utils.PermissionManager;
 
-import java.io.*;
+import java.io.File;
 
 public class MainFragment extends Fragment implements FileChangeListener, OnScrollListener {
 
@@ -42,7 +42,7 @@ public class MainFragment extends Fragment implements FileChangeListener, OnScro
         return rootView;
     }
 
-    private void setupViews(){
+    private void setupViews() {
         Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.toolbar);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
 
@@ -64,7 +64,7 @@ public class MainFragment extends Fragment implements FileChangeListener, OnScro
         viewPager.setAdapter(viewPagerAdapter);
     }
 
-    private void addTab(String path){
+    private void addTab(String path) {
         File file = new File(path);
 
         EditorFragment fragment = new EditorFragment();
@@ -83,13 +83,13 @@ public class MainFragment extends Fragment implements FileChangeListener, OnScro
         setOpenFAB();
     }
 
-    private void setSaveFAB(){
+    private void setSaveFAB() {
         fab.setImageResource(R.drawable.vector_save);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 EditorFragment editorFragment = (EditorFragment) viewPagerAdapter.getItem(tabLayout.getSelectedTabPosition());
-                if(editorFragment!=null)
+                if (editorFragment != null)
                     editorFragment.save();
             }
         });
@@ -102,7 +102,7 @@ public class MainFragment extends Fragment implements FileChangeListener, OnScro
         });
     }
 
-    private void setOpenFAB(){
+    private void setOpenFAB() {
         fab.setImageResource(R.drawable.vector_open);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -144,7 +144,7 @@ public class MainFragment extends Fragment implements FileChangeListener, OnScro
 
     @Override
     public void onFileChanged(boolean save) {
-        if(save)
+        if (save)
             setSaveFAB();
         else
             setOpenFAB();

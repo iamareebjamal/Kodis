@@ -28,7 +28,7 @@ public class InteractiveScrollView extends ScrollView {
     protected void onScrollChanged(int l, int t, int oldl, int oldt) {
         onScrollListener.onScrolled();
 
-        if(t>oldt)
+        if (t > oldt)
             onScrollListener.onScrolledDown();
         else
             onScrollListener.onScrolledUp();

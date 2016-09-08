@@ -34,14 +34,15 @@ public class EditorFragment extends Fragment implements TextWatcher {
     private EditText contentView;
     private View hidden;
 
-    public EditorFragment(){}
+    public EditorFragment() {
+    }
 
     public void setArguments(Bundle arguments) {
-        if(arguments.containsKey(FILE_KEY))
+        if (arguments.containsKey(FILE_KEY))
             file = (File) arguments.getSerializable(FILE_KEY);
     }
 
-    public void setFileChangeListener(FileChangeListener fileChangeListener){
+    public void setFileChangeListener(FileChangeListener fileChangeListener) {
         this.fileChangeListener = fileChangeListener;
     }
 
@@ -54,21 +55,21 @@ public class EditorFragment extends Fragment implements TextWatcher {
         return rootView;
     }
 
-    public void setupViews(){
+    public void setupViews() {
         contentView = (EditText) rootView.findViewById(R.id.fileContent);
         hidden = rootView.findViewById(R.id.hidden);
 
-        if(file!=null) {
+        if (file != null) {
             contentView.setVisibility(View.GONE);
             hidden.setVisibility(View.VISIBLE);
             new DocumentLoader().execute();
         }
     }
 
-    private boolean isChanged(){
-        if(FILE_CONTENT.length() >= CHUNK && FILE_CONTENT.substring(0, loaded.length()).equals(currentBuffer))
+    private boolean isChanged() {
+        if (FILE_CONTENT.length() >= CHUNK && FILE_CONTENT.substring(0, loaded.length()).equals(currentBuffer))
             return false;
-        else if(FILE_CONTENT.equals(currentBuffer))
+        else if (FILE_CONTENT.equals(currentBuffer))
             return false;
 
         return true;
@@ -124,18 +125,18 @@ public class EditorFragment extends Fragment implements TextWatcher {
         contentView.addTextChangedListener(this);
         currentBuffer = contentView.getText().toString();
 
-        if(isFileChangeListenerAttached()) fileChangeListener.onFileOpen();
+        if (isFileChangeListenerAttached()) fileChangeListener.onFileOpen();
     }
 
-    public void save(){
-        if(isChanged())
+    public void save() {
+        if (isChanged())
             new DocumentSaver().execute();
         else
             Toast.makeText(getContext(), "No change in file", Toast.LENGTH_SHORT).show();
     }
 
-    private boolean isFileChangeListenerAttached(){
-        return fileChangeListener!=null;
+    private boolean isFileChangeListenerAttached() {
+        return fileChangeListener != null;
     }
 
     @Override
@@ -146,7 +147,7 @@ public class EditorFragment extends Fragment implements TextWatcher {
     @Override
     public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
         currentBuffer = contentView.getText().toString();
-        if(isFileChangeListenerAttached()) fileChangeListener.onFileChanged(isChanged());
+        if (isFileChangeListenerAttached()) fileChangeListener.onFileChanged(isChanged());
     }
 
     @Override
@@ -177,9 +178,11 @@ public class EditorFragment extends Fragment implements TextWatcher {
                 } finally {
                     try {
                         br.close();
-                    } catch (IOException ioe) {}
+                    } catch (IOException ioe) {
+                    }
                 }
-            } catch (FileNotFoundException fnfe) {}
+            } catch (FileNotFoundException fnfe) {
+            }
 
             return null;
         }
@@ -198,18 +201,19 @@ public class EditorFragment extends Fragment implements TextWatcher {
             String toSave = currentBuffer;
             try {
                 output = new BufferedWriter(new FileWriter(file));
-                if(FILE_CONTENT.length() > CHUNK) {
+                if (FILE_CONTENT.length() > CHUNK) {
                     toSave = currentBuffer + FILE_CONTENT.substring(loaded.length(), FILE_CONTENT.length());
                 }
                 output.write(toSave);
-            } catch ( IOException e ) {
+            } catch (IOException e) {
                 e.printStackTrace();
             } finally {
-                if ( output != null ) {
+                if (output != null) {
                     try {
                         output.close();
                         FILE_CONTENT = toSave;
-                    } catch (IOException ioe) {}
+                    } catch (IOException ioe) {
+                    }
                 }
             }
 
@@ -219,7 +223,7 @@ public class EditorFragment extends Fragment implements TextWatcher {
         @Override
         protected void onPostExecute(Void v) {
             Toast.makeText(getContext(), "Saved", Toast.LENGTH_SHORT).show();
-            if(isFileChangeListenerAttached()) fileChangeListener.onFileSave();
+            if (isFileChangeListenerAttached()) fileChangeListener.onFileSave();
         }
     }
 }
