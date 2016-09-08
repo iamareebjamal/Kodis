@@ -1,4 +1,4 @@
-package com.kodis.ui.components;
+package com.kodis.ui.component;
 
 import android.content.Context;
 import android.util.AttributeSet;

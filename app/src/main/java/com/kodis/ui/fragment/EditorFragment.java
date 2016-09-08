@@ -2,10 +2,7 @@ package com.kodis.ui.fragment;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -17,7 +14,7 @@ import com.kodis.R;
 import com.kodis.listener.FileChangeListener;
 import com.kodis.listener.OnBottomReachedListener;
 import com.kodis.listener.OnScrollListener;
-import com.kodis.ui.components.InteractiveScrollView;
+import com.kodis.ui.component.InteractiveScrollView;
 
 import java.io.*;
 
@@ -102,22 +99,7 @@ public class EditorFragment extends Fragment implements TextWatcher {
 
         final InteractiveScrollView scrollView = (InteractiveScrollView) rootView.findViewById(R.id.scrollView);
         scrollView.setOnBottomReachedListener(null);
-        scrollView.setOnScrollListener(new OnScrollListener() {
-            @Override
-            public void onScrolled() {
-                contentView.setFocusable(false);
-            }
-
-            @Override
-            public void onScrolledUp() {
-                //fab.show();
-            }
-
-            @Override
-            public void onScrolledDown() {
-                //fab.hide();
-            }
-        });
+        scrollView.setOnScrollListener((OnScrollListener) fileChangeListener);
         scrollView.smoothScrollTo(0, 0);
 
         contentView.setFocusable(false);

@@ -17,12 +17,13 @@ import com.github.angads25.filepicker.model.DialogProperties;
 import com.github.angads25.filepicker.view.FilePickerDialog;
 import com.kodis.R;
 import com.kodis.listener.FileChangeListener;
+import com.kodis.listener.OnScrollListener;
 import com.kodis.ui.adapder.ViewPagerAdapter;
 import com.kodis.utils.PermissionManager;
 
 import java.io.*;
 
-public class MainFragment extends Fragment implements FileChangeListener {
+public class MainFragment extends Fragment implements FileChangeListener, OnScrollListener {
 
 
     private View rootView;
@@ -152,5 +153,20 @@ public class MainFragment extends Fragment implements FileChangeListener {
     @Override
     public void onFileSave() {
         setOpenFAB();
+    }
+
+    @Override
+    public void onScrolled() {
+
+    }
+
+    @Override
+    public void onScrolledUp() {
+        fab.show();
+    }
+
+    @Override
+    public void onScrolledDown() {
+        fab.hide();
     }
 }
