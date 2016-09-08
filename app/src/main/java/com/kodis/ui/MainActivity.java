@@ -1,4 +1,4 @@
-package com.kodis;
+package com.kodis.ui;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -19,6 +19,9 @@ import com.github.angads25.filepicker.controller.DialogSelectionListener;
 import com.github.angads25.filepicker.model.DialogConfigs;
 import com.github.angads25.filepicker.model.DialogProperties;
 import com.github.angads25.filepicker.view.FilePickerDialog;
+import com.kodis.ui.components.InteractiveScrollView;
+import com.kodis.utils.PermissionManager;
+import com.kodis.R;
 
 import java.io.*;
 

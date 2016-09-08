@@ -11,7 +11,7 @@
         android:paddingBottom="@dimen/activity_vertical_margin"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:showIn="@layout/activity_main"
-        tools:context="com.kodis.MainActivity">
+        tools:context=".ui.MainActivity">
 
     <RelativeLayout
             android:id="@+id/hidden"
@@ -48,7 +48,7 @@
                 android:text="Loading File..."/>
     </RelativeLayout>
 
-    <com.kodis.InteractiveScrollView
+    <com.kodis.ui.components.InteractiveScrollView
             android:id="@+id/scrollView"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
@@ -60,5 +60,5 @@
                 android:focusable="false"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"/>
-    </com.kodis.InteractiveScrollView>
+    </com.kodis.ui.components.InteractiveScrollView>
 </RelativeLayout>
