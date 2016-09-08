@@ -4,6 +4,8 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ScrollView;
+import com.kodis.listener.OnBottomReachedListener;
+import com.kodis.listener.OnScrollListener;
 
 public class InteractiveScrollView extends ScrollView {
     OnBottomReachedListener onBottomReachedListener;
@@ -56,16 +58,6 @@ public class InteractiveScrollView extends ScrollView {
 
     public void setOnScrollListener(OnScrollListener onScrollListener) {
         this.onScrollListener = onScrollListener;
-    }
-
-    public interface OnBottomReachedListener {
-        void onBottomReached();
-    }
-
-    public interface OnScrollListener {
-        void onScrolled();
-        void onScrolledUp();
-        void onScrolledDown();
     }
 
 }
