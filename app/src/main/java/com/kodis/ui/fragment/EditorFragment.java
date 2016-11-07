@@ -1,5 +1,7 @@
 package com.kodis.ui.fragment;
 
+import android.content.Context;
+import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -14,13 +16,19 @@ import com.kodis.R;
 import com.kodis.listener.FileChangeListener;
 import com.kodis.listener.OnBottomReachedListener;
 import com.kodis.listener.OnScrollListener;
+import com.kodis.ui.component.CodeEditText;
 import com.kodis.ui.component.InteractiveScrollView;
 
 import java.io.*;
 
 public class EditorFragment extends Fragment implements TextWatcher {
     public static final String FILE_KEY = "FILE";
+    public static final String CONTEXT_KEY = "CONTEXT";
+    public static final int NO_CHANGE = 0;
+    public static final int CHANGE_SAVE = 1;
+    public static final int CHANGE_QUIT = 2;
 
+    private Context context;
     private File file;
     private FileChangeListener fileChangeListener;
 
@@ -31,7 +39,7 @@ public class EditorFragment extends Fragment implements TextWatcher {
 
     private View rootView;
 
-    private EditText contentView;
+    private CodeEditText contentView;
     private View hidden;
 
     public EditorFragment() {
@@ -55,18 +63,64 @@ public class EditorFragment extends Fragment implements TextWatcher {
         return rootView;
     }
 
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        this.context = context;
+    }
+
     public void setupViews() {
-        contentView = (EditText) rootView.findViewById(R.id.fileContent);
+        contentView = (CodeEditText) rootView.findViewById(R.id.fileContent);
         hidden = rootView.findViewById(R.id.hidden);
 
         if (file != null) {
             contentView.setVisibility(View.GONE);
+            contentView.setTypeface(Typeface.createFromAsset(getContext().getAssets(), "fonts/Consolas.ttf"));
+
             hidden.setVisibility(View.VISIBLE);
             new DocumentLoader().execute();
         }
     }
 
-    private boolean isChanged() {
+    private String getFileSize() {
+        String modifiedFileSize = null;
+        double fileSize = 0.0;
+        if (file.isFile()) {
+            fileSize = (double) file.length();//in Bytes
+
+            if (fileSize < 1024) {
+                modifiedFileSize = String.valueOf(fileSize).concat("B");
+            } else if (fileSize > 1024 && fileSize < (1024 * 1024)) {
+                modifiedFileSize = String.valueOf(Math.round((fileSize / 1024 * 100.0)) / 100.0).concat("KB");
+            } else {
+                modifiedFileSize = String.valueOf(Math.round((fileSize / (1024 * 1204) * 100.0)) / 100.0).concat("MB");
+            }
+        } else {
+            modifiedFileSize = "Unknown";
+        }
+
+        return modifiedFileSize;
+    }
+
+    public String getFilePath() {
+        return file.getPath();
+    }
+
+    public String getFileName() {
+        return file.getName();
+    }
+
+    public String getFileInfo() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("File Name : " + file.getName() + "\n");
+        sb.append("Size : " + getFileSize() + "\n");
+        sb.append("Path : " + file.getPath() + "\n");
+
+        return sb.toString();
+    }
+
+    public boolean isChanged() {
         if (FILE_CONTENT.length() >= CHUNK && FILE_CONTENT.substring(0, loaded.length()).equals(currentBuffer))
             return false;
         else if (FILE_CONTENT.equals(currentBuffer))
@@ -77,7 +131,7 @@ public class EditorFragment extends Fragment implements TextWatcher {
 
     private void loadInChunks(InteractiveScrollView scrollView, final String bigString) {
         loaded.append(bigString.substring(0, CHUNK));
-        contentView.setText(loaded);
+        contentView.setTextHighlighted(loaded);
         scrollView.setOnBottomReachedListener(new OnBottomReachedListener() {
             @Override
             public void onBottomReached() {
@@ -91,7 +145,7 @@ public class EditorFragment extends Fragment implements TextWatcher {
                     loaded.append(buffer);
                 }
 
-                contentView.setText(loaded);
+                contentView.setTextHighlighted(loaded);
             }
         });
     }
@@ -116,7 +170,7 @@ public class EditorFragment extends Fragment implements TextWatcher {
             loadInChunks(scrollView, fileContent);
         else {
             loaded.append(fileContent);
-            contentView.setText(loaded);
+            contentView.setTextHighlighted(loaded);
         }
 
 
@@ -133,6 +187,12 @@ public class EditorFragment extends Fragment implements TextWatcher {
             new DocumentSaver().execute();
         else
             Toast.makeText(getContext(), "No change in file", Toast.LENGTH_SHORT).show();
+    }
+
+    private void onPostSave(){
+        Toast.makeText(context, "Saved", Toast.LENGTH_SHORT).show();
+
+        if (isFileChangeListenerAttached()) fileChangeListener.onFileSave();
     }
 
     private boolean isFileChangeListenerAttached() {
@@ -222,8 +282,7 @@ public class EditorFragment extends Fragment implements TextWatcher {
 
         @Override
         protected void onPostExecute(Void v) {
-            Toast.makeText(getContext(), "Saved", Toast.LENGTH_SHORT).show();
-            if (isFileChangeListenerAttached()) fileChangeListener.onFileSave();
+            onPostSave();
         }
     }
 }

@@ -1,15 +1,15 @@
-package com.kodis.ui.adapder;
+package com.kodis.ui.adapter;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ViewPagerAdapter extends FragmentPagerAdapter {
-    private final List<Fragment> mFragmentList = new ArrayList<>();
-    private final List<String> mFragmentTitleList = new ArrayList<>();
+public class ViewPagerAdapter extends FragmentStatePagerAdapter {
+    private List<Fragment> mFragmentList = new ArrayList<>();
+    private List<String> mFragmentTitleList = new ArrayList<>();
 
     public ViewPagerAdapter(FragmentManager fm) {
         super(fm);
@@ -28,6 +28,17 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
     public void addFragment(Fragment fragment, String title) {
         mFragmentList.add(fragment);
         mFragmentTitleList.add(title);
+    }
+
+    @Override
+    public int getItemPosition(Object object) {
+        // refresh all fragments when data set changed
+        return ViewPagerAdapter.POSITION_NONE;
+    }
+
+    public void removeTabPage(int position) {
+        mFragmentList.remove(position);
+        mFragmentTitleList.remove(position);
     }
 
     @Override

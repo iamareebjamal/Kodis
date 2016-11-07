@@ -3,4 +3,12 @@
     <color name="colorPrimary">#00BCD4</color>
     <color name="colorPrimaryDark">#0097A7</color>
     <color name="colorAccent">#FFC107</color>
+    <color name="textColor">#555555</color>
+    <color name="light_bg">#EFF1F5</color>
+    <color name="syntax_error">#8800</color>
+    <color name="syntax_number">#7ba212</color>
+    <color name="syntax_keyword">#399ed7</color>
+    <color name="syntax_builtin">#d79e39</color>
+    <color name="syntax_comment">#808080</color>
+
 </resources>

@@ -5,10 +5,11 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
         android:paddingTop="@dimen/activity_vertical_margin"
         android:paddingBottom="@dimen/activity_vertical_margin"
+        android:background="@color/light_bg"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:showIn="@layout/activity_main"
         tools:context=".ui.MainActivity">
@@ -53,11 +54,13 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-        <EditText
+        <com.kodis.ui.component.CodeEditText
                 android:id="@+id/fileContent"
                 android:text="Welcome to Kodis!"
                 android:background="@android:color/transparent"
                 android:focusable="false"
+                android:textSize="15sp"
+                android:textColor="@color/textColor"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"/>
     </com.kodis.ui.component.InteractiveScrollView>

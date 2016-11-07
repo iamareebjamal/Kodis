@@ -1,18 +1,34 @@
 package com.kodis.ui;
 
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 import com.kodis.R;
 
 
 public class MainActivity extends AppCompatActivity {
+    private TextView projectStructure, headerProject;
+    public DrawerLayout drawerLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        NavigationView navigationView = (NavigationView) findViewById(R.id.navView);
+        headerProject = (TextView) navigationView.getHeaderView(0).findViewById(R.id.header_project_name);
+        projectStructure = (TextView) findViewById(R.id.project_structure);
+
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setHomeAsUpIndicator(R.drawable.vector_menu);
+        actionBar.setDisplayHomeAsUpEnabled(true);
     }
 
     @Override
@@ -30,11 +46,23 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+
+        switch (id) {
+
+            case android.R.id.home:
+                drawerLayout.openDrawer(GravityCompat.START);
+                return true;
+
+            case R.id.action_settings:
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void updateNavViews(String header, String projectInfo) {
+        headerProject.setText(header);
+        projectStructure.setText(projectInfo);
     }
 
 }

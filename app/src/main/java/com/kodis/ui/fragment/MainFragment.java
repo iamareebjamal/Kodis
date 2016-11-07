@@ -1,15 +1,15 @@
 package com.kodis.ui.fragment;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.*;
 import android.widget.Toast;
 import com.github.angads25.filepicker.controller.DialogSelectionListener;
 import com.github.angads25.filepicker.model.DialogConfigs;
@@ -18,7 +18,8 @@ import com.github.angads25.filepicker.view.FilePickerDialog;
 import com.kodis.R;
 import com.kodis.listener.FileChangeListener;
 import com.kodis.listener.OnScrollListener;
-import com.kodis.ui.adapder.ViewPagerAdapter;
+import com.kodis.ui.MainActivity;
+import com.kodis.ui.adapter.ViewPagerAdapter;
 import com.kodis.utils.PermissionManager;
 
 import java.io.File;
@@ -39,7 +40,29 @@ public class MainFragment extends Fragment implements FileChangeListener, OnScro
         this.rootView = rootView;
 
         setupViews();
+        setHasOptionsMenu(true);
         return rootView;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_editor, menu);
+
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+
+            case R.id.action_close:
+                closeTab();
+                return true;
+            default:
+                break;
+        }
+
+        return false;
     }
 
     private void setupViews() {
@@ -54,9 +77,31 @@ public class MainFragment extends Fragment implements FileChangeListener, OnScro
 
         tabLayout = (TabLayout) rootView.findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
+
         tabLayout.setVisibility(View.GONE);
 
+        viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                int pos = tabLayout.getSelectedTabPosition();
+                EditorFragment editorFragment = (EditorFragment) viewPagerAdapter.getItem(pos);
+
+                ((MainActivity) getActivity()).updateNavViews(tabLayout.getTabAt(pos).getText().toString(), editorFragment.getFileInfo());
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+
         PermissionManager.verifyStoragePermissions(getActivity());
+
     }
 
     private void setupViewPager() {
@@ -65,17 +110,19 @@ public class MainFragment extends Fragment implements FileChangeListener, OnScro
 
     private void addTab(String path) {
         File file = new File(path);
-
         EditorFragment fragment = new EditorFragment();
-
         Bundle bundle = new Bundle();
         bundle.putSerializable(EditorFragment.FILE_KEY, file);
         fragment.setArguments(bundle);
         fragment.setFileChangeListener(this);
 
+        if (viewPagerAdapter.getCount() == 0)
+            ((MainActivity) getActivity()).updateNavViews(file.getName(), fragment.getFileInfo());
+
         viewPagerAdapter.addFragment(fragment, file.getName());
         viewPagerAdapter.notifyDataSetChanged();
     }
+
 
     private void setInitialFAB() {
         fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
@@ -95,7 +142,10 @@ public class MainFragment extends Fragment implements FileChangeListener, OnScro
         fab.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-                Toast.makeText(getContext(), "Save File", Toast.LENGTH_SHORT).show();
+                closeTab();
+
+                if (!((EditorFragment) viewPagerAdapter.getItem(tabLayout.getSelectedTabPosition())).isChanged())
+                    setOpenFAB();
                 return true;
             }
         });
@@ -113,9 +163,12 @@ public class MainFragment extends Fragment implements FileChangeListener, OnScro
             @Override
             public boolean onLongClick(View view) {
                 Toast.makeText(getContext(), "Open File", Toast.LENGTH_SHORT).show();
+                if (tabLayout.getTabCount() > 0) //added this
+                    closeTab();
                 return true;
             }
         });
+
     }
 
     private void openFilePicker() {
@@ -129,13 +182,83 @@ public class MainFragment extends Fragment implements FileChangeListener, OnScro
         dialog.setDialogSelectionListener(new DialogSelectionListener() {
             @Override
             public void onSelectedFilePaths(String[] files) {
-                ((AppCompatActivity)getActivity()).getSupportActionBar().hide();
+                if (files.length == 0) {
+                    Toast.makeText(getContext(), "No file selected", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                for (int i = 0; i < tabLayout.getTabCount(); i++) {
+                    File file = new File(files[0]);
+
+                    if (((EditorFragment) viewPagerAdapter.getItem(i)).getFilePath().equals(file.getPath())) {
+                        Toast.makeText(getContext(), "File already open", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                }
                 addTab(files[0]);
             }
         });
         dialog.show();
     }
 
+    private void removeTab(int position) {
+        if (tabLayout.getTabCount() < 1 || position >= tabLayout.getTabCount())
+            return;
+
+        tabLayout.removeTabAt(position);
+        viewPagerAdapter.removeTabPage(position);
+        viewPager.setAdapter(viewPagerAdapter);
+        if (tabLayout.getTabCount() <= 0) {
+            tabLayout.setVisibility(View.GONE);
+            rootView.findViewById(R.id.intro).setVisibility(View.VISIBLE);
+
+        }
+        setInitialFAB();
+
+
+    }
+
+    private void closeTab() {
+        if (tabLayout.getTabCount() <= 0) {
+            Toast.makeText(getContext(), "No file is open", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        final int position = tabLayout.getSelectedTabPosition();
+        final EditorFragment editorFragment = (EditorFragment) viewPagerAdapter.getItem(position);
+
+        if (editorFragment != null && editorFragment.isChanged()) {
+            new AlertDialog.Builder(getActivity())
+                    .setTitle("File is changed")
+                    .setMessage("Do you want to save file before quitting?")
+                    .setPositiveButton("Save", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            editorFragment.save();
+                            removeTab(position);
+
+                            viewPagerAdapter.notifyDataSetChanged();
+
+                        }
+                    })
+                    .setNegativeButton("Quit", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            removeTab(position);
+                            viewPagerAdapter.notifyDataSetChanged();
+
+                        }
+                    })
+                    .setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                        }
+                    }).show();
+        } else {
+            removeTab(position);
+        }
+
+    }
 
     @Override
     public void onFileOpen() {
@@ -170,4 +293,6 @@ public class MainFragment extends Fragment implements FileChangeListener, OnScro
     public void onScrolledDown() {
         fab.hide();
     }
+
+
 }
