@@ -1,6 +1,7 @@
 package com.kodis.ui;
 
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -10,16 +11,24 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 import com.kodis.R;
+import com.kodis.ui.fragment.MainFragment;
 
 
 public class MainActivity extends AppCompatActivity {
     private TextView projectStructure, headerProject;
-    public DrawerLayout drawerLayout;
+    private DrawerLayout drawerLayout;
+    private MainFragment mainFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if (savedInstanceState == null) {
+            mainFragment = (MainFragment) getSupportFragmentManager().findFragmentById(R.id.mainFragment);
+        } else {
+            mainFragment = (MainFragment) getSupportFragmentManager().getFragment(savedInstanceState, "mainFragment");
+        }
 
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         NavigationView navigationView = (NavigationView) findViewById(R.id.navView);
@@ -29,6 +38,12 @@ public class MainActivity extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         actionBar.setHomeAsUpIndicator(R.drawable.vector_menu);
         actionBar.setDisplayHomeAsUpEnabled(true);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+        super.onSaveInstanceState(outState, outPersistentState);
+        getSupportFragmentManager().putFragment(outState, "mainFragment", mainFragment);
     }
 
     @Override

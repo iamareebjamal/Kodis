@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="200dp"
+              android:gravity="bottom"
+              android:background="@color/colorPrimary">
+    <TextView android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:layout_margin="10dp"
+              android:textSize="25dp"
+              android:textColor="#ffffff"
+              android:id="@+id/header_project_name"
+              android:text="No File is Open"/>
+
+</LinearLayout>

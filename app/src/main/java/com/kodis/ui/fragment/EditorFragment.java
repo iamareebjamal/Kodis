@@ -4,9 +4,12 @@ import android.content.Context;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.annotation.StringDef;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,6 +55,36 @@ public class EditorFragment extends Fragment implements TextWatcher {
 
     public void setFileChangeListener(FileChangeListener fileChangeListener) {
         this.fileChangeListener = fileChangeListener;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt("CHUNK", CHUNK);
+        outState.putSerializable(FILE_KEY, file);
+        outState.putString("FILE_CONTENT", FILE_CONTENT);
+        outState.putString("currentBuffer", currentBuffer);
+        outState.putSerializable("loaded", loaded);
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        if(savedInstanceState!=null) {
+            CHUNK = savedInstanceState.getInt("CHUNK");
+            file = (File) savedInstanceState.getSerializable(FILE_KEY);
+            FILE_CONTENT = savedInstanceState.getString("FILE_CONTENT");
+            currentBuffer = savedInstanceState.getString("currentBuffer");
+            loaded = (StringBuilder) savedInstanceState.getSerializable("loaded");
+        }
+
     }
 
     @Override
