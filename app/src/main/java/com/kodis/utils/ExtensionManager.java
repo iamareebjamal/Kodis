@@ -6,6 +6,8 @@ public class ExtensionManager {
     }
 
     public static Language getLanguage(String extension){
+        if(extension==null) return Language.NONE;
+
         String normalized = extension.toLowerCase();
         if(normalized.equals("c")||normalized.equals("cpp")||normalized.equals("c++")||normalized.equals("h")||normalized.equals("hpp")||normalized.equals("h++")) {
             return Language.C;

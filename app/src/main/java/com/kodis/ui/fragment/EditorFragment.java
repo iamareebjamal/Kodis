@@ -15,6 +15,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.kodis.R;
 import com.kodis.listener.FileChangeListener;
@@ -27,10 +29,6 @@ import java.io.*;
 
 public class EditorFragment extends Fragment implements TextWatcher {
     public static final String FILE_KEY = "FILE";
-    public static final String CONTEXT_KEY = "CONTEXT";
-    public static final int NO_CHANGE = 0;
-    public static final int CHANGE_SAVE = 1;
-    public static final int CHANGE_QUIT = 2;
 
     private Context context;
     private File file;
@@ -107,6 +105,18 @@ public class EditorFragment extends Fragment implements TextWatcher {
     public void setupViews() {
         contentView = (CodeEditText) rootView.findViewById(R.id.fileContent);
         hidden = rootView.findViewById(R.id.hidden);
+
+        LinearLayout symbolLayout = (LinearLayout) rootView.findViewById(R.id.symbolLayout);
+        View.OnClickListener symbolClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                contentView.getText().insert(contentView.getSelectionStart(), ((TextView) view).getText().toString() );
+                Log.d("Kodis", ((TextView) view).getText().toString());
+            }
+        };
+        for(int i = 0; i < symbolLayout.getChildCount(); i++){
+            symbolLayout.getChildAt(i).setOnClickListener(symbolClickListener);
+        }
 
         if (file != null) {
             contentView.setVisibility(View.GONE);
