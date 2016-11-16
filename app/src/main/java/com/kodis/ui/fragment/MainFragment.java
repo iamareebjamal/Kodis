@@ -153,7 +153,7 @@ public class MainFragment extends Fragment implements FileChangeListener, OnScro
         }
     }
 
-    private void addTab(String path) {
+    public void addTab(String path) {
         File file = new File(path);
         EditorFragment fragment = new EditorFragment();
         Bundle bundle = new Bundle();

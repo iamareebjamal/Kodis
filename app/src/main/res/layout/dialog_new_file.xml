@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:orientation="vertical"
+              android:padding="16dp"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <EditText
+            android:id="@+id/file_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="new_file.txt"
+            android:hint="File Name"/>
+
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:text="Directory : "/>
+
+    <TextView
+            android:id="@+id/dir_path"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:background="#dddddd"
+            android:foreground="?selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:textSize="16dp"
+            android:text="/sdcard/"/>
+
+    <android.support.design.widget.FloatingActionButton
+            android:id="@+id/open"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:src="@drawable/vector_open"
+            android:layout_margin="@dimen/fab_margin"
+            app:fabSize="mini"/>
+
+</LinearLayout>
