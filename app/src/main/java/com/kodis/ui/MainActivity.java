@@ -1,5 +1,7 @@
 package com.kodis.ui;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.support.design.widget.NavigationView;
@@ -16,7 +18,10 @@ import android.widget.TextView;
 import com.kodis.R;
 import com.kodis.ui.fragment.MainFragment;
 import com.kodis.utils.ExtensionManager;
+import org.json.JSONArray;
+import org.json.JSONException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -79,6 +84,52 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public String[] getSavedFiles(){
+        SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
+        String json = sharedPref.getString("files", null);
+        String[] files = null;
+        if (json != null) {
+            try {
+                JSONArray a = new JSONArray(json);
+                files = new String[a.length()];
+                for (int i = 0; i < a.length(); i++) {
+                    files[i] = a.optString(i);
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return files;
+    }
+
+    @Override
+    protected void onDestroy() {
+
+        if(mainFragment==null) {
+            super.onDestroy();
+            return;
+        }
+
+        SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
+        String[] files = mainFragment.getOpenFiles();
+        SharedPreferences.Editor editor = sharedPref.edit();
+        JSONArray array = new JSONArray();
+
+        for (int i = 0; i < files.length; i++) {
+            array.put(files[i]);
+        }
+
+        if (files.length>0) {
+            editor.putString("files", array.toString());
+        } else {
+            editor.putString("files", null);
+        }
+        editor.commit();
+
+        super.onDestroy();
     }
 
     public void updateNavViews(String header, String projectInfo) {

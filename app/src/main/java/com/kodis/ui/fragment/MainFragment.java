@@ -32,7 +32,6 @@ import static android.content.ContentValues.TAG;
 
 public class MainFragment extends Fragment implements FileChangeListener, OnScrollListener, Serializable {
 
-
     private View rootView;
     private FloatingActionButton fab;
 
@@ -133,12 +132,18 @@ public class MainFragment extends Fragment implements FileChangeListener, OnScro
         });
 
         PermissionManager.verifyStoragePermissions(getActivity());
-
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
+        String[] files = ((MainActivity) getActivity()).getSavedFiles();
+        if(files != null && files.length>0){
+            for(String file : files) {
+                addTab(file);
+            }
+        }
 
         if(viewPagerAdapter.getCount()>0){
             EditorFragment fragment =(EditorFragment) viewPagerAdapter.getItem(0);
@@ -297,6 +302,16 @@ public class MainFragment extends Fragment implements FileChangeListener, OnScro
             removeTab(position);
         }
 
+    }
+
+    public String[] getOpenFiles(){
+        String[] files = new String[viewPagerAdapter.getCount()];
+        for(int i = 0; i < viewPagerAdapter.getCount(); i++){
+            EditorFragment editorFragment = (EditorFragment) viewPagerAdapter.getItem(i);
+            files[i] = editorFragment.getFilePath();
+        }
+
+        return files;
     }
 
     @Override
