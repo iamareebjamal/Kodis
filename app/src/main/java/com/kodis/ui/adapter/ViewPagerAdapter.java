@@ -2,7 +2,6 @@ package com.kodis.ui.adapter;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import com.kodis.ui.fragment.EditorFragment;
 
@@ -42,7 +41,7 @@ public class ViewPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public CharSequence getPageTitle(int position) {
-        return ((EditorFragment)mFragmentList.get(position)).getFileName();
+        return ((EditorFragment) mFragmentList.get(position)).getFileName();
     }
 
     public List<Fragment> getFragmentList() {

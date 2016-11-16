@@ -6,15 +6,12 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
-import android.support.annotation.StringDef;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,7 +19,6 @@ import com.kodis.R;
 import com.kodis.listener.FileChangeListener;
 import com.kodis.listener.OnBottomReachedListener;
 import com.kodis.listener.OnScrollListener;
-import com.kodis.ui.MainActivity;
 import com.kodis.ui.component.CodeEditText;
 import com.kodis.ui.component.InteractiveScrollView;
 
@@ -79,7 +75,7 @@ public class EditorFragment extends Fragment implements TextWatcher, Serializabl
         View rootView = inflater.inflate(R.layout.fragment_editor, container, false);
         this.rootView = rootView;
 
-        if(savedInstanceState!=null) {
+        if (savedInstanceState != null) {
             CHUNK = savedInstanceState.getInt("CHUNK");
             file = (File) savedInstanceState.getSerializable(FILE_KEY);
             FILE_CONTENT = savedInstanceState.getString("FILE_CONTENT");
@@ -106,10 +102,10 @@ public class EditorFragment extends Fragment implements TextWatcher, Serializabl
         View.OnClickListener symbolClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                contentView.getText().insert(contentView.getSelectionStart(), ((TextView) view).getText().toString() );
+                contentView.getText().insert(contentView.getSelectionStart(), ((TextView) view).getText().toString());
             }
         };
-        for(int i = 0; i < symbolLayout.getChildCount(); i++){
+        for (int i = 0; i < symbolLayout.getChildCount(); i++) {
             symbolLayout.getChildAt(i).setOnClickListener(symbolClickListener);
         }
 
@@ -122,7 +118,7 @@ public class EditorFragment extends Fragment implements TextWatcher, Serializabl
             scrollView.setOnBottomReachedListener(null);
             scrollView.setOnScrollListener((OnScrollListener) fileChangeListener);
 
-            if(FILE_CONTENT!=null && loaded!=null && currentBuffer!=null){
+            if (FILE_CONTENT != null && loaded != null && currentBuffer != null) {
                 restoreDocument();
             } else {
                 new DocumentLoader().execute();
@@ -152,8 +148,8 @@ public class EditorFragment extends Fragment implements TextWatcher, Serializabl
 
     public String getFileExtension() {
         int index = file.getName().lastIndexOf('.');
-        if(index > 0) {
-            return file.getName().substring(index+1);
+        if (index > 0) {
+            return file.getName().substring(index + 1);
         }
 
         return null;
@@ -176,7 +172,7 @@ public class EditorFragment extends Fragment implements TextWatcher, Serializabl
     }
 
     public boolean isChanged() {
-        if(FILE_CONTENT == null) {
+        if (FILE_CONTENT == null) {
             return false;
         }
 
@@ -237,7 +233,7 @@ public class EditorFragment extends Fragment implements TextWatcher, Serializabl
         if (isFileChangeListenerAttached()) fileChangeListener.onFileOpen();
     }
 
-    private void restoreDocument(){
+    private void restoreDocument() {
         scrollView.smoothScrollTo(0, 0);
 
         contentView.setFocusable(false);
@@ -263,7 +259,7 @@ public class EditorFragment extends Fragment implements TextWatcher, Serializabl
             Toast.makeText(getContext(), "No change in file", Toast.LENGTH_SHORT).show();
     }
 
-    private void onPostSave(){
+    private void onPostSave() {
         Toast.makeText(context, "Saved", Toast.LENGTH_SHORT).show();
 
         if (isFileChangeListenerAttached()) fileChangeListener.onFileSave();
@@ -279,7 +275,8 @@ public class EditorFragment extends Fragment implements TextWatcher, Serializabl
     }
 
     @Override
-    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
+    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+    }
 
     @Override
     public void afterTextChanged(Editable editable) {

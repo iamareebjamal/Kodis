@@ -12,11 +12,13 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.*;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 import com.github.angads25.filepicker.controller.DialogSelectionListener;
 import com.github.angads25.filepicker.model.DialogConfigs;
 import com.github.angads25.filepicker.model.DialogProperties;
@@ -29,9 +31,6 @@ import org.json.JSONException;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Pattern;
 
 
@@ -99,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void addFile(){
+    private void addFile() {
         final Context context = this;
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -142,19 +141,19 @@ public class MainActivity extends AppCompatActivity {
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                if(!Pattern.compile("[_a-zA-Z0-9\\-\\.]+").matcher(file_name.getText().toString()).matches()){
+                if (!Pattern.compile("[_a-zA-Z0-9\\-\\.]+").matcher(file_name.getText().toString()).matches()) {
                     Toast.makeText(context, "Invalid File name", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                File file = new File(dir.getText().toString()+File.separator+file_name.getText().toString());
-                if(!file.exists()) {
+                File file = new File(dir.getText().toString() + File.separator + file_name.getText().toString());
+                if (!file.exists()) {
                     try {
                         file.createNewFile();
                         Toast.makeText(context, "New file created", Toast.LENGTH_SHORT).show();
                         mainFragment.addTab(file.getPath());
                     } catch (IOException e) {
-                        Toast.makeText(context, "Couldn't create new file : "+file.getAbsolutePath(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "Couldn't create new file : " + file.getAbsolutePath(), Toast.LENGTH_SHORT).show();
                         e.printStackTrace();
                     }
                 } else {
@@ -168,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public String[] getSavedFiles(){
+    public String[] getSavedFiles() {
         SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
         String json = sharedPref.getString("files", null);
         String[] files = null;
@@ -190,7 +189,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
 
-        if(mainFragment==null) {
+        if (mainFragment == null) {
             super.onPause();
             return;
         }
@@ -204,7 +203,7 @@ public class MainActivity extends AppCompatActivity {
             array.put(files[i]);
         }
 
-        if (files.length>0) {
+        if (files.length > 0) {
             editor.putString("files", array.toString());
         } else {
             editor.putString("files", null);
@@ -219,36 +218,36 @@ public class MainActivity extends AppCompatActivity {
         projectStructure.setText(projectInfo);
     }
 
-    public void updateExtension(String extension){
+    public void updateExtension(String extension) {
         ImageView extImage = (ImageView) findViewById(R.id.extImage);
         TextView extText = (TextView) findViewById(R.id.extText);
 
-        if(extImage == null || extText == null)
+        if (extImage == null || extText == null)
             return;
 
         extImage.setVisibility(View.VISIBLE);
 
         ExtensionManager.Language language = ExtensionManager.getLanguage(extension);
 
-        if(language == ExtensionManager.Language.NONE) {
+        if (language == ExtensionManager.Language.NONE) {
             extImage.setVisibility(View.GONE);
             extText.setVisibility(View.VISIBLE);
             extText.setText(extension);
-        } else if(language == ExtensionManager.Language.TEXT){
+        } else if (language == ExtensionManager.Language.TEXT) {
             extImage.setImageResource(R.drawable.vector_txt);
-        } else if(language == ExtensionManager.Language.PYTHON){
+        } else if (language == ExtensionManager.Language.PYTHON) {
             extImage.setImageResource(R.drawable.vector_python);
-        } else if(language == ExtensionManager.Language.JAVA){
+        } else if (language == ExtensionManager.Language.JAVA) {
             extImage.setImageResource(R.drawable.vector_java);
-        } else if(language == ExtensionManager.Language.HTML){
+        } else if (language == ExtensionManager.Language.HTML) {
             extImage.setImageResource(R.drawable.vector_html);
-        } else if(language == ExtensionManager.Language.CSS){
+        } else if (language == ExtensionManager.Language.CSS) {
             extImage.setImageResource(R.drawable.vector_css);
-        } else if(language == ExtensionManager.Language.PHP){
+        } else if (language == ExtensionManager.Language.PHP) {
             extImage.setImageResource(R.drawable.vector_php);
-        } else if(language == ExtensionManager.Language.XML){
+        } else if (language == ExtensionManager.Language.XML) {
             extImage.setImageResource(R.drawable.vector_xml);
-        } else if(language == ExtensionManager.Language.C){
+        } else if (language == ExtensionManager.Language.C) {
             extImage.setImageResource(R.drawable.vector_cpp);
         }
     }

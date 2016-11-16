@@ -26,7 +26,7 @@ public class InteractiveScrollView extends ScrollView {
 
     @Override
     protected void onScrollChanged(int l, int t, int oldl, int oldt) {
-        if(onScrollListener == null || onBottomReachedListener == null)
+        if (onScrollListener == null || onBottomReachedListener == null)
             return;
 
         onScrollListener.onScrolled();

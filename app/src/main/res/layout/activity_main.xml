@@ -40,7 +40,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="210dp"
                     android:layout_marginLeft="10dp"
-                    android:id="@+id/project_structure" />
+                    android:id="@+id/project_structure"/>
         </LinearLayout>
 
 

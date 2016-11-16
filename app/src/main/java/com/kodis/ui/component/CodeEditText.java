@@ -1,12 +1,14 @@
 package com.kodis.ui.component;
 
 import android.content.Context;
-import android.graphics.*;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.text.Layout;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.ViewTreeObserver;
-import android.widget.EditText;
 
 import java.io.Serializable;
 
@@ -48,7 +50,7 @@ public class CodeEditText extends ShaderEditor implements Serializable {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        int padding = (int)getPixels(getDigitCount()*10+10);
+        int padding = (int) getPixels(getDigitCount() * 10 + 10);
         setPadding(padding, 0, 0, 0);
 
 
@@ -72,12 +74,12 @@ public class CodeEditText extends ShaderEditor implements Serializable {
     }
 
     private void drawLineNumber(Canvas canvas, Layout layout, int positionY, int line) {
-        int positionX =(int) layout.getLineLeft(line);
-        canvas.drawText(String.valueOf(line+1), positionX+getPixels(2), positionY, paint);
+        int positionX = (int) layout.getLineLeft(line);
+        canvas.drawText(String.valueOf(line + 1), positionX + getPixels(2), positionY, paint);
 
     }
 
-    private float getPixels(int dp){
+    private float getPixels(int dp) {
         return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, context.getResources().getDisplayMetrics());
     }
 

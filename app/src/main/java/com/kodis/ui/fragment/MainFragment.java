@@ -44,7 +44,7 @@ public class MainFragment extends Fragment implements FileChangeListener, OnScro
     @Override
     public void onSaveInstanceState(Bundle outState) {
         retainedPages = viewPagerAdapter.getFragmentList();
-        if(retainedPages.size()>0)
+        if (retainedPages.size() > 0)
             outState.putSerializable("pages", (Serializable) retainedPages);
         super.onSaveInstanceState(outState);
     }
@@ -54,7 +54,7 @@ public class MainFragment extends Fragment implements FileChangeListener, OnScro
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
 
-        if(savedInstanceState!=null){
+        if (savedInstanceState != null) {
             retainedPages = (List<Fragment>) savedInstanceState.getSerializable("pages");
         }
     }
@@ -98,8 +98,8 @@ public class MainFragment extends Fragment implements FileChangeListener, OnScro
 
         viewPager = (ViewPager) rootView.findViewById(R.id.viewpager);
         viewPagerAdapter = new ViewPagerAdapter(getActivity().getSupportFragmentManager());
-        if(retainedPages!=null && retainedPages.size()>0){
-            for(Fragment fragment : retainedPages){
+        if (retainedPages != null && retainedPages.size() > 0) {
+            for (Fragment fragment : retainedPages) {
                 viewPagerAdapter.addFragment(fragment);
             }
         }
@@ -139,15 +139,15 @@ public class MainFragment extends Fragment implements FileChangeListener, OnScro
         super.onActivityCreated(savedInstanceState);
 
         String[] files = ((MainActivity) getActivity()).getSavedFiles();
-        if(files != null && files.length>0){
-            for(String file : files) {
-                if(!isOpen(file))
+        if (files != null && files.length > 0) {
+            for (String file : files) {
+                if (!isOpen(file))
                     addTab(file);
             }
         }
 
-        if(viewPagerAdapter.getCount()>0){
-            EditorFragment fragment =(EditorFragment) viewPagerAdapter.getItem(0);
+        if (viewPagerAdapter.getCount() > 0) {
+            EditorFragment fragment = (EditorFragment) viewPagerAdapter.getItem(0);
             ((MainActivity) getActivity()).updateNavViews(fragment.getFileName(), fragment.getFileInfo());
             ((MainActivity) getActivity()).updateExtension(fragment.getFileExtension());
         }
@@ -234,7 +234,7 @@ public class MainFragment extends Fragment implements FileChangeListener, OnScro
                     return;
                 }
 
-                if(isOpen(files[0])) {
+                if (isOpen(files[0])) {
                     Toast.makeText(getContext(), "File already open", Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -314,9 +314,9 @@ public class MainFragment extends Fragment implements FileChangeListener, OnScro
 
     }
 
-    public String[] getOpenFiles(){
+    public String[] getOpenFiles() {
         String[] files = new String[viewPagerAdapter.getCount()];
-        for(int i = 0; i < viewPagerAdapter.getCount(); i++){
+        for (int i = 0; i < viewPagerAdapter.getCount(); i++) {
             EditorFragment editorFragment = (EditorFragment) viewPagerAdapter.getItem(i);
             files[i] = editorFragment.getFilePath();
         }
