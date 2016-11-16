@@ -1,16 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:layout_width="match_parent"
-              android:layout_height="200dp"
-              android:gravity="bottom"
-              android:background="@color/colorPrimary">
-    <TextView android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:layout_margin="10dp"
-              android:textSize="25dp"
-              android:textColor="#ffffff"
-              android:id="@+id/header_project_name"
-              android:text="No File is Open"/>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:layout_width="match_parent"
+             android:layout_height="200dp"
+             android:gravity="bottom"
+             android:background="#dddddd">
 
-</LinearLayout>
+
+    <TextView
+            android:id="@+id/header_project_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:textSize="25dp"
+            android:text="No File is Open"
+            android:layout_gravity="bottom"/>
+
+    <TextView
+            android:id="@+id/extText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:textSize="50dp"
+            android:text="txt"
+            android:visibility="gone"
+            android:layout_gravity="center"/>
+
+    <ImageView
+            android:id="@+id/extImage"
+            android:layout_width="130dp"
+            android:layout_height="130dp"
+            android:src="@mipmap/ic_launcher"
+            android:visibility="gone"
+            android:layout_gravity="center"/>
+
+</FrameLayout>

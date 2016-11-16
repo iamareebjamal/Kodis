@@ -3,13 +3,13 @@ package com.kodis.ui.adapter;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import com.kodis.ui.fragment.EditorFragment;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ViewPagerAdapter extends FragmentStatePagerAdapter {
     private List<Fragment> mFragmentList = new ArrayList<>();
-    private List<String> mFragmentTitleList = new ArrayList<>();
 
     public ViewPagerAdapter(FragmentManager fm) {
         super(fm);
@@ -25,9 +25,8 @@ public class ViewPagerAdapter extends FragmentStatePagerAdapter {
         return mFragmentList.size();
     }
 
-    public void addFragment(Fragment fragment, String title) {
+    public void addFragment(Fragment fragment) {
         mFragmentList.add(fragment);
-        mFragmentTitleList.add(title);
     }
 
     @Override
@@ -38,11 +37,10 @@ public class ViewPagerAdapter extends FragmentStatePagerAdapter {
 
     public void removeTabPage(int position) {
         mFragmentList.remove(position);
-        mFragmentTitleList.remove(position);
     }
 
     @Override
     public CharSequence getPageTitle(int position) {
-        return mFragmentTitleList.get(position);
+        return ((EditorFragment)mFragmentList.get(position)).getFileName();
     }
 }

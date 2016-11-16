@@ -7,11 +7,17 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import com.kodis.R;
 import com.kodis.ui.fragment.MainFragment;
+import com.kodis.utils.ExtensionManager;
+
+import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -78,6 +84,37 @@ public class MainActivity extends AppCompatActivity {
     public void updateNavViews(String header, String projectInfo) {
         headerProject.setText(header);
         projectStructure.setText(projectInfo);
+    }
+
+    public void updateExtension(String extension){
+        ImageView extImage = (ImageView) findViewById(R.id.extImage);
+        TextView extText = (TextView) findViewById(R.id.extText);
+
+        extImage.setVisibility(View.VISIBLE);
+
+        ExtensionManager.Language language = ExtensionManager.getLanguage(extension);
+
+        if(language == ExtensionManager.Language.NONE) {
+            extImage.setVisibility(View.GONE);
+            extText.setVisibility(View.VISIBLE);
+            extText.setText(extension);
+        } else if(language == ExtensionManager.Language.TEXT){
+            extImage.setImageResource(R.drawable.vector_txt);
+        } else if(language == ExtensionManager.Language.PYTHON){
+            extImage.setImageResource(R.drawable.vector_python);
+        } else if(language == ExtensionManager.Language.JAVA){
+            extImage.setImageResource(R.drawable.vector_java);
+        } else if(language == ExtensionManager.Language.HTML){
+            extImage.setImageResource(R.drawable.vector_html);
+        } else if(language == ExtensionManager.Language.CSS){
+            extImage.setImageResource(R.drawable.vector_css);
+        } else if(language == ExtensionManager.Language.PHP){
+            extImage.setImageResource(R.drawable.vector_php);
+        } else if(language == ExtensionManager.Language.XML){
+            extImage.setImageResource(R.drawable.vector_xml);
+        } else if(language == ExtensionManager.Language.C){
+            extImage.setImageResource(R.drawable.vector_cpp);
+        }
     }
 
 }

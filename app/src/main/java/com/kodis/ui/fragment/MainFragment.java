@@ -105,6 +105,7 @@ public class MainFragment extends Fragment implements FileChangeListener, OnScro
                 EditorFragment editorFragment = (EditorFragment) viewPagerAdapter.getItem(pos);
 
                 ((MainActivity) getActivity()).updateNavViews(tabLayout.getTabAt(pos).getText().toString(), editorFragment.getFileInfo());
+                ((MainActivity) getActivity()).updateExtension(editorFragment.getFileExtension());
             }
 
             @Override
@@ -129,10 +130,12 @@ public class MainFragment extends Fragment implements FileChangeListener, OnScro
         fragment.setArguments(bundle);
         fragment.setFileChangeListener(this);
 
-        if (viewPagerAdapter.getCount() == 0)
-            ((MainActivity) getActivity()).updateNavViews(file.getName(), fragment.getFileInfo());
+        if (viewPagerAdapter.getCount() == 0) {
+            ((MainActivity) getActivity()).updateNavViews(fragment.getFileName(), fragment.getFileInfo());
+            ((MainActivity) getActivity()).updateExtension(fragment.getFileExtension());
+        }
 
-        viewPagerAdapter.addFragment(fragment, file.getName());
+        viewPagerAdapter.addFragment(fragment);
         viewPagerAdapter.notifyDataSetChanged();
     }
 

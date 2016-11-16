@@ -138,6 +138,15 @@ public class EditorFragment extends Fragment implements TextWatcher {
         return modifiedFileSize;
     }
 
+    public String getFileExtension() {
+        int index = file.getName().lastIndexOf('.');
+        if(index > 0) {
+            return file.getName().substring(index+1);
+        }
+
+        return null;
+    }
+
     public String getFilePath() {
         return file.getPath();
     }
@@ -148,7 +157,6 @@ public class EditorFragment extends Fragment implements TextWatcher {
 
     public String getFileInfo() {
         StringBuilder sb = new StringBuilder();
-        sb.append("File Name : " + file.getName() + "\n");
         sb.append("Size : " + getFileSize() + "\n");
         sb.append("Path : " + file.getPath() + "\n");
 
