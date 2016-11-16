@@ -141,7 +141,8 @@ public class MainFragment extends Fragment implements FileChangeListener, OnScro
         String[] files = ((MainActivity) getActivity()).getSavedFiles();
         if(files != null && files.length>0){
             for(String file : files) {
-                addTab(file);
+                if(!isOpen(file))
+                    addTab(file);
             }
         }
 
@@ -232,18 +233,27 @@ public class MainFragment extends Fragment implements FileChangeListener, OnScro
                     Toast.makeText(getContext(), "No file selected", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                for (int i = 0; i < tabLayout.getTabCount(); i++) {
-                    File file = new File(files[0]);
 
-                    if (((EditorFragment) viewPagerAdapter.getItem(i)).getFilePath().equals(file.getPath())) {
-                        Toast.makeText(getContext(), "File already open", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
+                if(isOpen(files[0])) {
+                    Toast.makeText(getContext(), "File already open", Toast.LENGTH_SHORT).show();
+                    return;
                 }
                 addTab(files[0]);
             }
         });
         dialog.show();
+    }
+
+    private boolean isOpen(String path) {
+        for (int i = 0; i < tabLayout.getTabCount(); i++) {
+            File file = new File(path);
+
+            if (((EditorFragment) viewPagerAdapter.getItem(i)).getFilePath().equals(file.getPath())) {
+
+                return true;
+            }
+        }
+        return false;
     }
 
     private void removeTab(int position) {

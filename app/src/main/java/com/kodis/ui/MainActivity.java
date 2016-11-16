@@ -107,10 +107,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onDestroy() {
+    protected void onPause() {
 
         if(mainFragment==null) {
-            super.onDestroy();
+            super.onPause();
             return;
         }
 
@@ -130,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
         }
         editor.commit();
 
-        super.onDestroy();
+        super.onPause();
     }
 
     public void updateNavViews(String header, String projectInfo) {
