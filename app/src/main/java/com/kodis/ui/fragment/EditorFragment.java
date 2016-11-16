@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringDef;
 import android.support.v4.app.Fragment;
@@ -112,6 +113,7 @@ public class EditorFragment extends Fragment implements TextWatcher {
             contentView.setTypeface(Typeface.createFromAsset(getContext().getAssets(), "fonts/Consolas.ttf"));
 
             hidden.setVisibility(View.VISIBLE);
+
             new DocumentLoader().execute();
         }
     }
@@ -239,13 +241,18 @@ public class EditorFragment extends Fragment implements TextWatcher {
 
     @Override
     public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-        currentBuffer = contentView.getText().toString();
-        if (isFileChangeListenerAttached()) fileChangeListener.onFileChanged(isChanged());
+
     }
 
     @Override
     public void afterTextChanged(Editable editable) {
-
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                currentBuffer = contentView.getText().toString();
+                if (isFileChangeListenerAttached()) fileChangeListener.onFileChanged(isChanged());
+            }
+        }, 1000);
     }
 
 
