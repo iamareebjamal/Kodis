@@ -10,6 +10,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.*;
 import android.widget.Toast;
 import com.github.angads25.filepicker.controller.DialogSelectionListener;
@@ -24,6 +25,10 @@ import com.kodis.ui.adapter.ViewPagerAdapter;
 import com.kodis.utils.PermissionManager;
 
 import java.io.File;
+import java.io.Serializable;
+import java.util.List;
+
+import static android.content.ContentValues.TAG;
 
 public class MainFragment extends Fragment implements FileChangeListener, OnScrollListener {
 
@@ -35,16 +40,24 @@ public class MainFragment extends Fragment implements FileChangeListener, OnScro
     private TabLayout tabLayout;
     private ViewPagerAdapter viewPagerAdapter;
 
+    private List<Fragment> retainedPages;
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        retainedPages = viewPagerAdapter.getFragmentList();
+        if(retainedPages.size()>0)
+            outState.putSerializable("pages", (Serializable) retainedPages);
+        super.onSaveInstanceState(outState);
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
-    }
 
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-
+        if(savedInstanceState!=null){
+            retainedPages = (List<Fragment>) savedInstanceState.getSerializable("pages");
+        }
     }
 
     @Override
@@ -86,7 +99,12 @@ public class MainFragment extends Fragment implements FileChangeListener, OnScro
 
         viewPager = (ViewPager) rootView.findViewById(R.id.viewpager);
         viewPagerAdapter = new ViewPagerAdapter(getActivity().getSupportFragmentManager());
-        setupViewPager();
+        if(retainedPages!=null && retainedPages.size()>0){
+            for(Fragment fragment : retainedPages){
+                viewPagerAdapter.addFragment(fragment);
+            }
+        }
+        viewPager.setAdapter(viewPagerAdapter);
 
         tabLayout = (TabLayout) rootView.findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
@@ -118,8 +136,15 @@ public class MainFragment extends Fragment implements FileChangeListener, OnScro
 
     }
 
-    private void setupViewPager() {
-        viewPager.setAdapter(viewPagerAdapter);
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        if(viewPagerAdapter.getCount()>0){
+            EditorFragment fragment =(EditorFragment) viewPagerAdapter.getItem(0);
+            ((MainActivity) getActivity()).updateNavViews(fragment.getFileName(), fragment.getFileInfo());
+            ((MainActivity) getActivity()).updateExtension(fragment.getFileExtension());
+        }
     }
 
     private void addTab(String path) {
@@ -229,8 +254,6 @@ public class MainFragment extends Fragment implements FileChangeListener, OnScro
 
         }
         setInitialFAB();
-
-
     }
 
     private void closeTab() {
@@ -310,5 +333,14 @@ public class MainFragment extends Fragment implements FileChangeListener, OnScro
         fab.hide();
     }
 
+    @Override
+    public void onDestroy() {
+        Log.d(TAG, "onDestroy");
+        try {
+            super.onDestroy();
+        } catch (NullPointerException npe) {
+            Log.e(TAG, "NPE: Bug workaround");
+        }
+    }
 
 }

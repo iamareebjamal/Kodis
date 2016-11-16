@@ -27,7 +27,7 @@ import com.kodis.ui.component.InteractiveScrollView;
 
 import java.io.*;
 
-public class EditorFragment extends Fragment implements TextWatcher {
+public class EditorFragment extends Fragment implements TextWatcher, Serializable {
     public static final String FILE_KEY = "FILE";
 
     private Context context;
@@ -62,6 +62,7 @@ public class EditorFragment extends Fragment implements TextWatcher {
         setRetainInstance(true);
     }
 
+    /*
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -84,7 +85,7 @@ public class EditorFragment extends Fragment implements TextWatcher {
             loaded = (StringBuilder) savedInstanceState.getSerializable("loaded");
         }
 
-    }
+    }*/
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -111,7 +112,6 @@ public class EditorFragment extends Fragment implements TextWatcher {
             @Override
             public void onClick(View view) {
                 contentView.getText().insert(contentView.getSelectionStart(), ((TextView) view).getText().toString() );
-                Log.d("Kodis", ((TextView) view).getText().toString());
             }
         };
         for(int i = 0; i < symbolLayout.getChildCount(); i++){

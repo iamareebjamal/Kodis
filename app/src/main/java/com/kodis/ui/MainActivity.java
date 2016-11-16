@@ -90,6 +90,9 @@ public class MainActivity extends AppCompatActivity {
         ImageView extImage = (ImageView) findViewById(R.id.extImage);
         TextView extText = (TextView) findViewById(R.id.extText);
 
+        if(extImage == null || extText == null)
+            return;
+
         extImage.setVisibility(View.VISIBLE);
 
         ExtensionManager.Language language = ExtensionManager.getLanguage(extension);
