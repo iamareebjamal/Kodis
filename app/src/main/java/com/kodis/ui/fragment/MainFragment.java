@@ -30,7 +30,7 @@ import java.util.List;
 
 import static android.content.ContentValues.TAG;
 
-public class MainFragment extends Fragment implements FileChangeListener, OnScrollListener {
+public class MainFragment extends Fragment implements FileChangeListener, OnScrollListener, Serializable {
 
 
     private View rootView;

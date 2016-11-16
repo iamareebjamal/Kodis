@@ -22,6 +22,7 @@ import com.kodis.R;
 import com.kodis.listener.FileChangeListener;
 import com.kodis.listener.OnBottomReachedListener;
 import com.kodis.listener.OnScrollListener;
+import com.kodis.ui.MainActivity;
 import com.kodis.ui.component.CodeEditText;
 import com.kodis.ui.component.InteractiveScrollView;
 
@@ -43,6 +44,7 @@ public class EditorFragment extends Fragment implements TextWatcher, Serializabl
 
     private CodeEditText contentView;
     private View hidden;
+    private InteractiveScrollView scrollView;
 
     public EditorFragment() {
     }
@@ -62,7 +64,6 @@ public class EditorFragment extends Fragment implements TextWatcher, Serializabl
         setRetainInstance(true);
     }
 
-    /*
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -71,11 +72,13 @@ public class EditorFragment extends Fragment implements TextWatcher, Serializabl
         outState.putString("FILE_CONTENT", FILE_CONTENT);
         outState.putString("currentBuffer", currentBuffer);
         outState.putSerializable("loaded", loaded);
+        outState.putSerializable("fileChangeListener", (MainFragment) fileChangeListener);
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.fragment_editor, container, false);
+        this.rootView = rootView;
 
         if(savedInstanceState!=null) {
             CHUNK = savedInstanceState.getInt("CHUNK");
@@ -83,14 +86,8 @@ public class EditorFragment extends Fragment implements TextWatcher, Serializabl
             FILE_CONTENT = savedInstanceState.getString("FILE_CONTENT");
             currentBuffer = savedInstanceState.getString("currentBuffer");
             loaded = (StringBuilder) savedInstanceState.getSerializable("loaded");
+            fileChangeListener = (FileChangeListener) savedInstanceState.getSerializable("fileChangeListener");
         }
-
-    }*/
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_editor, container, false);
-        this.rootView = rootView;
 
         setupViews();
         return rootView;
@@ -123,8 +120,15 @@ public class EditorFragment extends Fragment implements TextWatcher, Serializabl
             contentView.setTypeface(Typeface.createFromAsset(getContext().getAssets(), "fonts/Consolas.ttf"));
 
             hidden.setVisibility(View.VISIBLE);
+            scrollView = (InteractiveScrollView) rootView.findViewById(R.id.scrollView);
+            scrollView.setOnBottomReachedListener(null);
+            scrollView.setOnScrollListener((OnScrollListener) fileChangeListener);
 
-            new DocumentLoader().execute();
+            if(FILE_CONTENT!=null && loaded!=null && currentBuffer!=null){
+                restoreDocument();
+            } else {
+                new DocumentLoader().execute();
+            }
         }
     }
 
@@ -174,6 +178,10 @@ public class EditorFragment extends Fragment implements TextWatcher, Serializabl
     }
 
     public boolean isChanged() {
+        if(FILE_CONTENT == null) {
+            return false;
+        }
+
         if (FILE_CONTENT.length() >= CHUNK && FILE_CONTENT.substring(0, loaded.length()).equals(currentBuffer))
             return false;
         else if (FILE_CONTENT.equals(currentBuffer))
@@ -204,10 +212,6 @@ public class EditorFragment extends Fragment implements TextWatcher, Serializabl
     }
 
     private void loadDocument(final String fileContent) {
-
-        final InteractiveScrollView scrollView = (InteractiveScrollView) rootView.findViewById(R.id.scrollView);
-        scrollView.setOnBottomReachedListener(null);
-        scrollView.setOnScrollListener((OnScrollListener) fileChangeListener);
         scrollView.smoothScrollTo(0, 0);
 
         contentView.setFocusable(false);
@@ -235,6 +239,25 @@ public class EditorFragment extends Fragment implements TextWatcher, Serializabl
         if (isFileChangeListenerAttached()) fileChangeListener.onFileOpen();
     }
 
+    private void restoreDocument(){
+        scrollView.smoothScrollTo(0, 0);
+
+        contentView.setFocusable(false);
+        contentView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                contentView.setFocusableInTouchMode(true);
+            }
+        });
+        contentView.setTextHighlighted(loaded);
+
+        hidden.setVisibility(View.GONE);
+        contentView.setVisibility(View.VISIBLE);
+        contentView.addTextChangedListener(this);
+
+        if (isFileChangeListenerAttached()) fileChangeListener.onFileOpen();
+    }
+
     public void save() {
         if (isChanged())
             new DocumentSaver().execute();
@@ -258,9 +281,7 @@ public class EditorFragment extends Fragment implements TextWatcher, Serializabl
     }
 
     @Override
-    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-    }
+    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
 
     @Override
     public void afterTextChanged(Editable editable) {
@@ -268,6 +289,7 @@ public class EditorFragment extends Fragment implements TextWatcher, Serializabl
             @Override
             public void run() {
                 currentBuffer = contentView.getText().toString();
+
                 if (isFileChangeListenerAttached()) fileChangeListener.onFileChanged(isChanged());
             }
         }, 1000);
