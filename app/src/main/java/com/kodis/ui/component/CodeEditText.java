@@ -8,10 +8,12 @@ import android.util.TypedValue;
 import android.view.ViewTreeObserver;
 import android.widget.EditText;
 
-public class CodeEditText extends ShaderEditor {
+import java.io.Serializable;
+
+public class CodeEditText extends ShaderEditor implements Serializable {
     private Context context;
-    private Paint paint = new Paint();
-    private Paint bgPaint = new Paint();
+    private transient Paint paint = new Paint();
+    private transient Paint bgPaint = new Paint();
     private Layout layout;
 
     public CodeEditText(Context context, AttributeSet attrs) {

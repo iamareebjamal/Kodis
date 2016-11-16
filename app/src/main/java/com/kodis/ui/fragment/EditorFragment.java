@@ -31,20 +31,20 @@ import java.io.*;
 public class EditorFragment extends Fragment implements TextWatcher, Serializable {
     public static final String FILE_KEY = "FILE";
 
-    private Context context;
+    private transient Context context;
     private File file;
-    private FileChangeListener fileChangeListener;
+    private transient FileChangeListener fileChangeListener;
 
     private int CHUNK = 20000;
     private String FILE_CONTENT;
     private String currentBuffer;
     private StringBuilder loaded;
 
-    private View rootView;
+    private transient View rootView;
 
-    private CodeEditText contentView;
-    private View hidden;
-    private InteractiveScrollView scrollView;
+    private transient CodeEditText contentView;
+    private transient View hidden;
+    private transient InteractiveScrollView scrollView;
 
     public EditorFragment() {
     }
@@ -72,7 +72,6 @@ public class EditorFragment extends Fragment implements TextWatcher, Serializabl
         outState.putString("FILE_CONTENT", FILE_CONTENT);
         outState.putString("currentBuffer", currentBuffer);
         outState.putSerializable("loaded", loaded);
-        outState.putSerializable("fileChangeListener", (MainFragment) fileChangeListener);
     }
 
     @Override
@@ -86,7 +85,6 @@ public class EditorFragment extends Fragment implements TextWatcher, Serializabl
             FILE_CONTENT = savedInstanceState.getString("FILE_CONTENT");
             currentBuffer = savedInstanceState.getString("currentBuffer");
             loaded = (StringBuilder) savedInstanceState.getSerializable("loaded");
-            fileChangeListener = (FileChangeListener) savedInstanceState.getSerializable("fileChangeListener");
         }
 
         setupViews();

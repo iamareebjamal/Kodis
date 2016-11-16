@@ -21,13 +21,14 @@ import com.kodis.utils.ExtensionManager;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
     private TextView projectStructure, headerProject;
-    private DrawerLayout drawerLayout;
+    private transient DrawerLayout drawerLayout;
     private MainFragment mainFragment;
 
     @Override
