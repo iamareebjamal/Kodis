@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -12,22 +11,21 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.*;
 import com.github.angads25.filepicker.controller.DialogSelectionListener;
 import com.github.angads25.filepicker.model.DialogConfigs;
 import com.github.angads25.filepicker.model.DialogProperties;
 import com.github.angads25.filepicker.view.FilePickerDialog;
 import com.kodis.R;
+import com.kodis.holder.IconTreeItemHolder;
 import com.kodis.ui.fragment.EditorFragment;
 import com.kodis.ui.fragment.MainFragment;
 import com.kodis.utils.ExtensionManager;
+import com.unnamed.b.atv.model.TreeNode;
+import com.unnamed.b.atv.view.AndroidTreeView;
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -54,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         NavigationView navigationView = (NavigationView) findViewById(R.id.navView);
         headerProject = (TextView) navigationView.getHeaderView(0).findViewById(R.id.header_project_name);
-        projectStructure = (TextView) findViewById(R.id.project_structure);
+        projectStructure = (TextView) findViewById(R.id.project_info);
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setHomeAsUpIndicator(R.drawable.vector_menu);
@@ -86,13 +84,13 @@ public class MainActivity extends AppCompatActivity {
         switch (id) {
 
             case android.R.id.home:
-                if(mainFragment!=null) {
-                    EditorFragment editorFragment = mainFragment.getSelectedTab();
-                    if (editorFragment != null) {
-                        updateNavViews(editorFragment.getFileName(), editorFragment.getFileInfo());
-                        updateExtension(editorFragment.getFileExtension());
-                    }
+                EditorFragment editorFragment = mainFragment.getSelectedTab();
+                if (editorFragment != null) {
+                    updateProjectStructure();
+                    updateNavViews(editorFragment.getFileName(), editorFragment.getFileInfo());
+                    updateExtension(editorFragment.getFileExtension());
                 }
+
                 drawerLayout.openDrawer(GravityCompat.START);
                 return true;
 
@@ -219,6 +217,22 @@ public class MainActivity extends AppCompatActivity {
         editor.commit();
 
         super.onPause();
+    }
+
+    private void updateProjectStructure(){
+        TreeNode root = TreeNode.root();
+        TreeNode parent = new TreeNode(new IconTreeItemHolder.FileTreeItem("Parent", null, true));
+        TreeNode child0 = new TreeNode(new IconTreeItemHolder.FileTreeItem("ChildNode0", null, true));
+        TreeNode child1 = new TreeNode(new IconTreeItemHolder.FileTreeItem("ChildNode1", null, false));
+        parent.addChildren(child0, child1);
+        root.addChild(parent);
+        AndroidTreeView treeView = new AndroidTreeView(this, root);
+        treeView.setDefaultAnimation(true);
+        treeView.setDefaultViewHolder(IconTreeItemHolder.class);
+        treeView.setDefaultContainerStyle(R.style.TreeNodeStyle);
+
+        LinearLayout linearLayout = (LinearLayout) findViewById(R.id.rootLayout);
+        linearLayout.addView(treeView.getView());
     }
 
     private void updateNavViews(String header, String projectInfo) {

@@ -21,7 +21,7 @@ import com.kodis.R;
 import com.kodis.listener.FileChangeListener;
 import com.kodis.listener.OnScrollListener;
 import com.kodis.ui.MainActivity;
-import com.kodis.ui.adapter.ViewPagerAdapter;
+import com.kodis.adapter.ViewPagerAdapter;
 import com.kodis.utils.PermissionManager;
 
 import java.io.File;
@@ -127,6 +127,8 @@ public class MainFragment extends Fragment implements FileChangeListener, OnScro
 
     public void addTab(String path) {
         File file = new File(path);
+        if(!file.exists())
+            return;
         EditorFragment fragment = new EditorFragment();
         Bundle bundle = new Bundle();
         bundle.putSerializable(EditorFragment.FILE_KEY, file);
