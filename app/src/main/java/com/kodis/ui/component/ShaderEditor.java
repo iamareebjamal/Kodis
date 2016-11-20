@@ -3,6 +3,7 @@ package com.kodis.ui.component;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Handler;
 import android.support.v4.content.ContextCompat;
@@ -24,39 +25,35 @@ public class ShaderEditor extends EditText {
             "\\b(\\d*[.]?\\d+)\\b");
     private static final Pattern PATTERN_PREPROCESSOR = Pattern.compile(
             "^[\t ]*(#define|#undef|#if|#ifdef|#ifndef|#else|#elif|#endif|" +
-                    "#error|#pragma|#extension|#version|#line)\\b",
+                    "#error|#pragma|#extension|#version|#line|#include)\\b",
             Pattern.MULTILINE);
     private static final Pattern PATTERN_KEYWORDS = Pattern.compile(
-            "\\b(attribute|const|uniform|varying|break|continue|" +
-                    "do|for|while|if|else|in|out|inout|float|int|void|bool|true|false|" +
-                    "lowp|mediump|highp|precision|invariant|discard|return|mat2|mat3|" +
-                    "mat4|vec2|vec3|vec4|ivec2|ivec3|ivec4|bvec2|bvec3|bvec4|sampler2D|" +
-                    "samplerCube|struct|gl_Vertex|gl_FragCoord|gl_FragColor)\\b");
+            "\\b(" +
+                    "and|or|xor|for|do|while|foreach|as|return|die|exit|if|then|else|" +
+                    "elseif|new|delete|try|throw|catch|finally|class|function|string|" +
+                    "array|object|resource|var|bool|boolean|int|integer|float|double|" +
+                    "real|string|array|global|const|static|public|private|protected|" +
+                    "published|extends|switch|true|false|null|void|this|self|struct|" +
+                    "char|signed|unsigned|short|long|True|False" +
+                    ")\\b");
     private static final Pattern PATTERN_BUILTINS = Pattern.compile(
             "\\b(radians|degrees|sin|cos|tan|asin|acos|atan|pow|" +
-                    "exp|log|exp2|log2|sqrt|inversesqrt|abs|sign|floor|ceil|fract|mod|" +
-                    "min|max|clamp|mix|step|smoothstep|length|distance|dot|cross|" +
-                    "normalize|faceforward|reflect|refract|matrixCompMult|lessThan|" +
-                    "lessThanEqual|greaterThan|greaterThanEqual|equal|notEqual|any|all|" +
-                    "not|dFdx|dFdy|fwidth|texture2D|texture2DProj|texture2DLod|" +
-                    "texture2DProjLod|textureCube|textureCubeLod)\\b");
+                    "exp|log|sqrt|inversesqrt|abs|sign|floor|ceil|fract|mod|" +
+                    "min|max|length|Math|System|out|printf|print|println|" +
+                    "console|Arrays|Array|vector|List|list|ArrayList|Map|HashMap|" +
+                    "dict|java|util|lang|import|from|in)\\b");
     private static final Pattern PATTERN_COMMENTS = Pattern.compile(
             "/\\*(?:.|[\\n\\r])*?\\*/|//.*");
     private static final Pattern PATTERN_TRAILING_WHITE_SPACE = Pattern.compile(
             "[\\t ]+$",
             Pattern.MULTILINE);
-    private static final Pattern PATTERN_INSERT_UNIFORM = Pattern.compile(
-            "\\b(uniform[a-zA-Z0-9_ \t;\\[\\]\r\n]+[\r\n])\\b",
-            Pattern.MULTILINE);
-    private static final Pattern PATTERN_ENDIF = Pattern.compile(
-            "(#endif)\\b");
     private final Handler updateHandler = new Handler();
     private OnTextChangedListener onTextChangedListener;
     private int updateDelay = 1000;
     private int errorLine = 0;
     private boolean dirty = false;
     private boolean modified = true;
-    private int colorError;
+    private int colorVariable;
     private int colorNumber;
     private int colorKeyword;
     private int colorBuiltin;
@@ -76,6 +73,7 @@ public class ShaderEditor extends EditText {
             };
     private int tabWidthInCharacters = 0;
     private int tabWidth = 0;
+
     public ShaderEditor(Context context) {
         super(context);
 
@@ -181,40 +179,6 @@ public class ShaderEditor extends EditText {
                 1);
     }
 
-    public void addUniform(String statement) {
-        if (statement == null)
-            return;
-
-        Editable e = getText();
-        Matcher m = PATTERN_INSERT_UNIFORM.matcher(e);
-        int start;
-
-        if (m.find())
-            start = Math.max(0, m.end() - 1);
-        else {
-            // add an empty line between the last #endif
-            // and the now following uniform
-            if ((start = endIndexOfLastEndIf(e)) > -1)
-                statement = "\n" + statement;
-
-            // move index past line break or to the start
-            // of the text when no #endif was found
-            ++start;
-        }
-
-        e.insert(start, statement + ";\n");
-    }
-
-    private int endIndexOfLastEndIf(Editable e) {
-        Matcher m = PATTERN_ENDIF.matcher(e);
-        int idx = -1;
-
-        while (m.find())
-            idx = m.end();
-
-        return idx;
-    }
-
     private void init(Context context) {
         setHorizontallyScrolling(true);
 
@@ -286,7 +250,7 @@ public class ShaderEditor extends EditText {
 
         setSyntaxColors(context);
         /*setUpdateDelay(
-			ShaderEditorApplication
+            ShaderEditorApplication
 				.preferences
 				.getUpdateDelay() );
 		setTabWidth(
@@ -296,9 +260,7 @@ public class ShaderEditor extends EditText {
     }
 
     private void setSyntaxColors(Context context) {
-        colorError = ContextCompat.getColor(
-                context,
-                R.color.syntax_error);
+        colorVariable = ContextCompat.getColor(context, R.color.syntax_variable);
         colorNumber = ContextCompat.getColor(
                 context,
                 R.color.syntax_number);
@@ -333,59 +295,31 @@ public class ShaderEditor extends EditText {
             if (e.length() == 0)
                 return e;
 
-            if (errorLine > 0) {
-                Matcher m = PATTERN_LINE.matcher(e);
+            for (Matcher m = PATTERN_NUMBERS.matcher(e); m.find(); )
+                e.setSpan(new ForegroundColorSpan(colorNumber), m.start(), m.end(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
-                for (int n = errorLine;
-                     n-- > 0 && m.find(); )
-                    ;
+            for (Matcher m = PATTERN_PREPROCESSOR.matcher(e); m.find(); )
+                e.setSpan(new ForegroundColorSpan(colorBuiltin), m.start(), m.end(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
-                e.setSpan(
-                        new BackgroundColorSpan(colorError),
-                        m.start(),
-                        m.end(),
-                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            for (Matcher m = PATTERN_KEYWORDS.matcher(e); m.find(); )
+                e.setSpan(new ForegroundColorSpan(colorKeyword), m.start(), m.end(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+            for (Matcher m = PATTERN_BUILTINS.matcher(e); m.find(); )
+                e.setSpan(new ForegroundColorSpan(colorBuiltin), m.start(), m.end(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+            for(Matcher m = Pattern.compile("\\\"(.*?)\\\"|\\\'(.*?)\\\'").matcher(e); m.find(); ) {
+                ForegroundColorSpan spans[] = e.getSpans(m.start(), m.end(), ForegroundColorSpan.class);
+                for(ForegroundColorSpan span : spans)
+                    e.removeSpan(span);
+                e.setSpan(new ForegroundColorSpan(Color.parseColor("#81C784")), m.start(), m.end(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
 
-            for (Matcher m = PATTERN_NUMBERS.matcher(e);
-                 m.find(); )
-                e.setSpan(
-                        new ForegroundColorSpan(colorNumber),
-                        m.start(),
-                        m.end(),
-                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-            for (Matcher m = PATTERN_PREPROCESSOR.matcher(e);
-                 m.find(); )
-                e.setSpan(
-                        new ForegroundColorSpan(colorKeyword),
-                        m.start(),
-                        m.end(),
-                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-            for (Matcher m = PATTERN_KEYWORDS.matcher(e);
-                 m.find(); )
-                e.setSpan(
-                        new ForegroundColorSpan(colorKeyword),
-                        m.start(),
-                        m.end(),
-                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-            for (Matcher m = PATTERN_BUILTINS.matcher(e);
-                 m.find(); )
-                e.setSpan(
-                        new ForegroundColorSpan(colorBuiltin),
-                        m.start(),
-                        m.end(),
-                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-            for (Matcher m = PATTERN_COMMENTS.matcher(e);
-                 m.find(); )
-                e.setSpan(
-                        new ForegroundColorSpan(colorComment),
-                        m.start(),
-                        m.end(),
-                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            for (Matcher m = PATTERN_COMMENTS.matcher(e); m.find(); ) {
+                ForegroundColorSpan spans[] = e.getSpans(m.start(), m.end(), ForegroundColorSpan.class);
+                for(ForegroundColorSpan span : spans)
+                    e.removeSpan(span);
+                e.setSpan(new ForegroundColorSpan(colorComment), m.start(), m.end(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
         } catch (IllegalStateException ex) {
             // raised by Matcher.start()/.end() when
             // no successful match has been made what
@@ -425,7 +359,7 @@ public class ShaderEditor extends EditText {
                             c == '%' ||
                             c == '^' ||
                             c == '=')
-                        --pt;
+                        pt--;
 
                     dataBefore = true;
                 }

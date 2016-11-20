@@ -3,12 +3,12 @@
     <color name="colorPrimary">#00BCD4</color>
     <color name="colorPrimaryDark">#0097A7</color>
     <color name="colorAccent">#FFC107</color>
-    <color name="textColor">#555555</color>
-    <color name="light_bg">#EFF1F5</color>
-    <color name="syntax_error">#8800</color>
-    <color name="syntax_number">#7ba212</color>
-    <color name="syntax_keyword">#399ed7</color>
-    <color name="syntax_builtin">#d79e39</color>
-    <color name="syntax_comment">#808080</color>
+    <color name="textColor">#4f5b66</color>
+    <color name="light_bg">#eff1f5</color>
+    <color name="syntax_number">#f99157</color>
+    <color name="syntax_keyword">#7E57C2</color>
+    <color name="syntax_variable">#ef5350</color>
+    <color name="syntax_builtin">#66cccc</color>
+    <color name="syntax_comment">#a7adba</color>
 
 </resources>
