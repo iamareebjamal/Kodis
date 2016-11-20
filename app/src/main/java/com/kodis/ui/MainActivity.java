@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.annotation.IntDef;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -59,6 +60,33 @@ public class MainActivity extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         actionBar.setHomeAsUpIndicator(R.drawable.vector_menu);
         actionBar.setDisplayHomeAsUpEnabled(true);
+
+        drawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
+            @Override
+            public void onDrawerSlide(View drawerView, float slideOffset) {
+
+            }
+
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                EditorFragment editorFragment = mainFragment.getSelectedTab();
+                if (editorFragment != null) {
+                    updateProjectStructure(editorFragment.getFilePath());
+                    updateNavViews(editorFragment.getFileName(), editorFragment.getFileInfo());
+                    updateExtension(editorFragment.getFileExtension());
+                }
+            }
+
+            @Override
+            public void onDrawerClosed(View drawerView) {
+
+            }
+
+            @Override
+            public void onDrawerStateChanged(int newState) {
+
+            }
+        });
     }
 
     @Override
@@ -80,22 +108,11 @@ public class MainActivity extends AppCompatActivity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-
         switch (id) {
 
             case android.R.id.home:
-                EditorFragment editorFragment = mainFragment.getSelectedTab();
-                if (editorFragment != null) {
-                    updateProjectStructure(editorFragment.getFilePath());
-                    updateNavViews(editorFragment.getFileName(), editorFragment.getFileInfo());
-                    updateExtension(editorFragment.getFileExtension());
-                }
-
                 drawerLayout.openDrawer(GravityCompat.START);
                 return true;
-
             case R.id.action_add:
                 addFile();
                 return true;
