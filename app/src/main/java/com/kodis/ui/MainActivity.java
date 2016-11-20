@@ -246,6 +246,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateProjectStructure(String path){
+        LinearLayout linearLayout = (LinearLayout) findViewById(R.id.rootLayout);
+        linearLayout.removeAllViews();
+
         TreeNode root = TreeNode.root();
         buildDirectory(root, new File(path).getParentFile());
         AndroidTreeView treeView = new AndroidTreeView(this, root);
@@ -264,11 +267,13 @@ public class MainActivity extends AppCompatActivity {
                     } else {
                         Toast.makeText(getApplicationContext(), "Not a code file", Toast.LENGTH_SHORT).show();
                     }
+
+                    drawerLayout.closeDrawer(GravityCompat.START);
                 }
             }
         });
 
-        LinearLayout linearLayout = (LinearLayout) findViewById(R.id.rootLayout);
+
         linearLayout.addView(treeView.getView());
     }
 

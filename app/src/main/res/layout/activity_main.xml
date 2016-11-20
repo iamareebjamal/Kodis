@@ -32,7 +32,6 @@
             android:background="#eeeeee"
             app:headerLayout="@layout/nav_header">
         <LinearLayout
-                android:id="@+id/rootLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
@@ -43,6 +42,12 @@
                     android:layout_marginTop="210dp"
                     android:layout_marginLeft="10dp"
                     android:id="@+id/project_info"/>
+            <LinearLayout
+                    android:id="@+id/rootLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+            </LinearLayout>
         </LinearLayout>
 
 
