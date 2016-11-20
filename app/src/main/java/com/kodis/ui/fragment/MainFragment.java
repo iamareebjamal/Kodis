@@ -109,29 +109,6 @@ public class MainFragment extends Fragment implements FileChangeListener, OnScro
         tabLayout.setupWithViewPager(viewPager);
 
         tabLayout.setVisibility(View.GONE);
-
-        viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                int pos = tabLayout.getSelectedTabPosition();
-                EditorFragment editorFragment = (EditorFragment) viewPagerAdapter.getItem(pos);
-
-                /*
-                ((MainActivity) getActivity()).updateNavViews(tabLayout.getTabAt(pos).getText().toString(), editorFragment.getFileInfo());
-                ((MainActivity) getActivity()).updateExtension(editorFragment.getFileExtension());*/
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
-        });
-
         PermissionManager.verifyStoragePermissions(getActivity());
     }
 
@@ -146,13 +123,6 @@ public class MainFragment extends Fragment implements FileChangeListener, OnScro
                     addTab(file);
             }
         }
-
-        /*
-        if (viewPagerAdapter.getCount() > 0) {
-            EditorFragment fragment = (EditorFragment) viewPagerAdapter.getItem(0);
-            ((MainActivity) getActivity()).updateNavViews(fragment.getFileName(), fragment.getFileInfo());
-            ((MainActivity) getActivity()).updateExtension(fragment.getFileExtension());
-        }*/
     }
 
     public void addTab(String path) {
@@ -162,11 +132,6 @@ public class MainFragment extends Fragment implements FileChangeListener, OnScro
         bundle.putSerializable(EditorFragment.FILE_KEY, file);
         fragment.setArguments(bundle);
         fragment.setFileChangeListener(this);
-
-        /*if (viewPagerAdapter.getCount() == 0) {
-            ((MainActivity) getActivity()).updateNavViews(fragment.getFileName(), fragment.getFileInfo());
-            ((MainActivity) getActivity()).updateExtension(fragment.getFileExtension());
-        }*/
 
         viewPagerAdapter.addFragment(fragment);
         viewPagerAdapter.notifyDataSetChanged();
