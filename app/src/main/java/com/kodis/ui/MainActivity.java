@@ -12,6 +12,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,6 +25,7 @@ import com.github.angads25.filepicker.model.DialogConfigs;
 import com.github.angads25.filepicker.model.DialogProperties;
 import com.github.angads25.filepicker.view.FilePickerDialog;
 import com.kodis.R;
+import com.kodis.ui.fragment.EditorFragment;
 import com.kodis.ui.fragment.MainFragment;
 import com.kodis.utils.ExtensionManager;
 import org.json.JSONArray;
@@ -36,7 +38,7 @@ import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity {
     private TextView projectStructure, headerProject;
-    private transient DrawerLayout drawerLayout;
+    private DrawerLayout drawerLayout;
     private MainFragment mainFragment;
 
     @Override
@@ -44,11 +46,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if (savedInstanceState == null) {
+        if (savedInstanceState == null)
             mainFragment = (MainFragment) getSupportFragmentManager().findFragmentById(R.id.mainFragment);
-        } else {
+        else
             mainFragment = (MainFragment) getSupportFragmentManager().getFragment(savedInstanceState, "mainFragment");
-        }
 
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         NavigationView navigationView = (NavigationView) findViewById(R.id.navView);
@@ -61,8 +62,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
-        super.onSaveInstanceState(outState, outPersistentState);
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
         getSupportFragmentManager().putFragment(outState, "mainFragment", mainFragment);
     }
 
@@ -85,6 +86,13 @@ public class MainActivity extends AppCompatActivity {
         switch (id) {
 
             case android.R.id.home:
+                if(mainFragment!=null) {
+                    EditorFragment editorFragment = mainFragment.getSelectedTab();
+                    if (editorFragment != null) {
+                        updateNavViews(editorFragment.getFileName(), editorFragment.getFileInfo());
+                        updateExtension(editorFragment.getFileExtension());
+                    }
+                }
                 drawerLayout.openDrawer(GravityCompat.START);
                 return true;
 
@@ -213,12 +221,12 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
     }
 
-    public void updateNavViews(String header, String projectInfo) {
+    private void updateNavViews(String header, String projectInfo) {
         headerProject.setText(header);
         projectStructure.setText(projectInfo);
     }
 
-    public void updateExtension(String extension) {
+    private void updateExtension(String extension) {
         ImageView extImage = (ImageView) findViewById(R.id.extImage);
         TextView extText = (TextView) findViewById(R.id.extText);
 

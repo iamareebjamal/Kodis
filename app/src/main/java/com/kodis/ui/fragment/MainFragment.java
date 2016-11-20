@@ -121,8 +121,9 @@ public class MainFragment extends Fragment implements FileChangeListener, OnScro
                 int pos = tabLayout.getSelectedTabPosition();
                 EditorFragment editorFragment = (EditorFragment) viewPagerAdapter.getItem(pos);
 
+                /*
                 ((MainActivity) getActivity()).updateNavViews(tabLayout.getTabAt(pos).getText().toString(), editorFragment.getFileInfo());
-                ((MainActivity) getActivity()).updateExtension(editorFragment.getFileExtension());
+                ((MainActivity) getActivity()).updateExtension(editorFragment.getFileExtension());*/
             }
 
             @Override
@@ -146,11 +147,12 @@ public class MainFragment extends Fragment implements FileChangeListener, OnScro
             }
         }
 
+        /*
         if (viewPagerAdapter.getCount() > 0) {
             EditorFragment fragment = (EditorFragment) viewPagerAdapter.getItem(0);
             ((MainActivity) getActivity()).updateNavViews(fragment.getFileName(), fragment.getFileInfo());
             ((MainActivity) getActivity()).updateExtension(fragment.getFileExtension());
-        }
+        }*/
     }
 
     public void addTab(String path) {
@@ -161,10 +163,10 @@ public class MainFragment extends Fragment implements FileChangeListener, OnScro
         fragment.setArguments(bundle);
         fragment.setFileChangeListener(this);
 
-        if (viewPagerAdapter.getCount() == 0) {
+        /*if (viewPagerAdapter.getCount() == 0) {
             ((MainActivity) getActivity()).updateNavViews(fragment.getFileName(), fragment.getFileInfo());
             ((MainActivity) getActivity()).updateExtension(fragment.getFileExtension());
-        }
+        }*/
 
         viewPagerAdapter.addFragment(fragment);
         viewPagerAdapter.notifyDataSetChanged();
@@ -322,6 +324,13 @@ public class MainFragment extends Fragment implements FileChangeListener, OnScro
         }
 
         return files;
+    }
+
+    public EditorFragment getSelectedTab(){
+        if(viewPagerAdapter.getCount() > 0)
+            return (EditorFragment) viewPagerAdapter.getItem(tabLayout.getSelectedTabPosition());
+
+        return null;
     }
 
     @Override
