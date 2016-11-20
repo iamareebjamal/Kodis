@@ -233,7 +233,6 @@ public class MainFragment extends Fragment implements FileChangeListener, OnScro
         if (tabLayout.getTabCount() <= 0) {
             tabLayout.setVisibility(View.GONE);
             rootView.findViewById(R.id.intro).setVisibility(View.VISIBLE);
-
         }
         setInitialFAB();
     }

@@ -3,6 +3,7 @@ package com.kodis.ui.adapter;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.util.Log;
 import com.kodis.ui.fragment.EditorFragment;
 
 import java.util.ArrayList;
