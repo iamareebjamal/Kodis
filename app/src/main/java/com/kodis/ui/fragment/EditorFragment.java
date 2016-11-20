@@ -21,6 +21,7 @@ import com.kodis.listener.OnBottomReachedListener;
 import com.kodis.listener.OnScrollListener;
 import com.kodis.ui.component.CodeEditText;
 import com.kodis.ui.component.InteractiveScrollView;
+import com.kodis.utils.ExtensionManager;
 
 import java.io.*;
 
@@ -147,12 +148,7 @@ public class EditorFragment extends Fragment implements TextWatcher, Serializabl
     }
 
     public String getFileExtension() {
-        int index = file.getName().lastIndexOf('.');
-        if (index > 0) {
-            return file.getName().substring(index + 1);
-        }
-
-        return null;
+        return ExtensionManager.getExtension(file.getName());
     }
 
     public String getFilePath() {

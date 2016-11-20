@@ -27,10 +27,9 @@ public class IconTreeItemHolder extends TreeNode.BaseNodeViewHolder<IconTreeItem
         arrow = (ImageView) view.findViewById(R.id.file_browser_arrow);
 
         fileName.setText(value.text);
-        if(value.isDirectory){
-            fileIcon.setImageResource(R.drawable.vector_open);
-        } else {
-            fileIcon.setImageResource(R.drawable.vector_file);
+        fileIcon.setImageResource(value.icon);
+
+        if (node.isLeaf()) {
             arrow.setVisibility(View.INVISIBLE);
         }
 
@@ -48,14 +47,15 @@ public class IconTreeItemHolder extends TreeNode.BaseNodeViewHolder<IconTreeItem
 
     public static class FileTreeItem {
 
+        public int icon;
+
         public String text;
         public String path;
-        public boolean isDirectory;
 
-        public FileTreeItem(String text, String path, boolean isDirectory) {
+        public FileTreeItem(int icon, String text, String path) {
+            this.icon = icon;
             this.text = text;
             this.path = path;
-            this.isDirectory = isDirectory;
         }
     }
 }

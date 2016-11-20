@@ -11,6 +11,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,6 +31,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.regex.Pattern;
 
@@ -86,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
             case android.R.id.home:
                 EditorFragment editorFragment = mainFragment.getSelectedTab();
                 if (editorFragment != null) {
-                    updateProjectStructure();
+                    updateProjectStructure(editorFragment.getFilePath());
                     updateNavViews(editorFragment.getFileName(), editorFragment.getFileInfo());
                     updateExtension(editorFragment.getFileExtension());
                 }
@@ -219,17 +221,52 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
     }
 
-    private void updateProjectStructure(){
+    private void buildDirectory(TreeNode root, File path){
+        File[] files = path.listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(File file, String name) {
+                return !name.startsWith(".");
+            }
+        });
+
+        if(files == null)
+            return;
+
+        for(File file : files) {
+            if(file.isDirectory()){
+                TreeNode folderNode = new TreeNode(new IconTreeItemHolder.FileTreeItem(R.drawable.vector_open, file.getName(), file.getAbsolutePath()));
+                buildDirectory(folderNode, file);
+                root.addChild(folderNode);
+            } else {
+                TreeNode folderNode = new TreeNode(new IconTreeItemHolder.FileTreeItem(ExtensionManager.getIcon(file.getName()), file.getName(), file.getAbsolutePath()));
+                root.addChild(folderNode);
+            }
+        }
+
+    }
+
+    private void updateProjectStructure(String path){
         TreeNode root = TreeNode.root();
-        TreeNode parent = new TreeNode(new IconTreeItemHolder.FileTreeItem("Parent", null, true));
-        TreeNode child0 = new TreeNode(new IconTreeItemHolder.FileTreeItem("ChildNode0", null, true));
-        TreeNode child1 = new TreeNode(new IconTreeItemHolder.FileTreeItem("ChildNode1", null, false));
-        parent.addChildren(child0, child1);
-        root.addChild(parent);
+        buildDirectory(root, new File(path).getParentFile());
         AndroidTreeView treeView = new AndroidTreeView(this, root);
         treeView.setDefaultAnimation(true);
         treeView.setDefaultViewHolder(IconTreeItemHolder.class);
         treeView.setDefaultContainerStyle(R.style.TreeNodeStyle);
+        treeView.setDefaultNodeClickListener(new TreeNode.TreeNodeClickListener() {
+            @Override
+            public void onClick(TreeNode node, Object value) {
+                IconTreeItemHolder.FileTreeItem fileTreeItem = (IconTreeItemHolder.FileTreeItem) value;
+                if(node.isLeaf()) {
+                    File file = new File(fileTreeItem.path);
+
+                    if(!ExtensionManager.isBinaryFile(file)){
+                        mainFragment.addTab(file);
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Not a code file", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        });
 
         LinearLayout linearLayout = (LinearLayout) findViewById(R.id.rootLayout);
         linearLayout.addView(treeView.getView());
