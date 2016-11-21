@@ -30,13 +30,28 @@
             android:textSize="16dp"
             android:text="/sdcard/"/>
 
-    <android.support.design.widget.FloatingActionButton
-            android:id="@+id/open"
-            android:layout_width="wrap_content"
+    <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="right"
-            android:src="@drawable/vector_open"
-            android:layout_margin="@dimen/fab_margin"
-            app:fabSize="mini"/>
+            android:orientation="horizontal">
+
+        <android.support.v7.widget.AppCompatCheckBox
+                android:id="@+id/isFolder"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:text="Create Directory" />
+
+        <android.support.design.widget.FloatingActionButton
+                android:id="@+id/open"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right|center_vertical"
+                android:src="@drawable/vector_open"
+                android:layout_margin="@dimen/fab_margin"
+                app:fabSize="mini"/>
+
+    </LinearLayout>
 
 </LinearLayout>

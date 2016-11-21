@@ -12,6 +12,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatCheckBox;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -135,6 +136,7 @@ public class MainActivity extends AppCompatActivity {
         final TextView dir = (TextView) root.findViewById(R.id.dir_path);
         final EditText file_name = (EditText) root.findViewById(R.id.file_name);
         final FloatingActionButton fab = (FloatingActionButton) root.findViewById(R.id.open);
+        final AppCompatCheckBox isFolder = (AppCompatCheckBox) root.findViewById(R.id.isFolder);
         dir.setText(DialogConfigs.DEFAULT_DIR);
 
         View.OnClickListener openDir = new View.OnClickListener() {
@@ -166,6 +168,28 @@ public class MainActivity extends AppCompatActivity {
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
+                if(isFolder.isChecked()){
+                    if (!Pattern.compile("[_a-zA-Z0-9\\-]+").matcher(file_name.getText().toString()).matches()) {
+                        Toast.makeText(context, "Invalid Folder name", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    File file = new File(dir.getText().toString() + File.separator + file_name.getText().toString());
+                    if (!file.exists()) {
+                        boolean created = file.mkdir();
+                        if(created)
+                            Toast.makeText(context, "New folder created", Toast.LENGTH_SHORT).show();
+                        else
+                            Toast.makeText(context, "Couldn't create new folder : " + file.getAbsolutePath(), Toast.LENGTH_SHORT).show();
+
+                    } else {
+                        Toast.makeText(context, "Folder already present", Toast.LENGTH_SHORT).show();
+                    }
+
+                    return;
+                }
+
+
                 if (!Pattern.compile("[_a-zA-Z0-9\\-\\.]+").matcher(file_name.getText().toString()).matches()) {
                     Toast.makeText(context, "Invalid File name", Toast.LENGTH_SHORT).show();
                     return;
