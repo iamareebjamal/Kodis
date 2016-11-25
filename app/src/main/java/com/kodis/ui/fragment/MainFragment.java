@@ -108,7 +108,8 @@ public class MainFragment extends Fragment implements FileChangeListener, OnScro
         tabLayout = (TabLayout) rootView.findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
 
-        tabLayout.setVisibility(View.GONE);
+        if(viewPagerAdapter.getCount()<=0)
+            tabLayout.setVisibility(View.GONE);
         PermissionManager.verifyStoragePermissions(getActivity());
     }
 

@@ -44,6 +44,7 @@ public class EditorFragment extends Fragment implements TextWatcher, Serializabl
     private transient InteractiveScrollView scrollView;
 
     public EditorFragment() {
+
     }
 
     public void setArguments(Bundle arguments) {
@@ -54,35 +55,10 @@ public class EditorFragment extends Fragment implements TextWatcher, Serializabl
     public void setFileChangeListener(FileChangeListener fileChangeListener) {
         this.fileChangeListener = fileChangeListener;
     }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setRetainInstance(true);
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putInt("CHUNK", CHUNK);
-        outState.putSerializable(FILE_KEY, file);
-        outState.putString("FILE_CONTENT", FILE_CONTENT);
-        outState.putString("currentBuffer", currentBuffer);
-        outState.putSerializable("loaded", loaded);
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_editor, container, false);
         this.rootView = rootView;
-
-        if (savedInstanceState != null) {
-            CHUNK = savedInstanceState.getInt("CHUNK");
-            file = (File) savedInstanceState.getSerializable(FILE_KEY);
-            FILE_CONTENT = savedInstanceState.getString("FILE_CONTENT");
-            currentBuffer = savedInstanceState.getString("currentBuffer");
-            loaded = (StringBuilder) savedInstanceState.getSerializable("loaded");
-        }
 
         setupViews();
         return rootView;
@@ -119,11 +95,7 @@ public class EditorFragment extends Fragment implements TextWatcher, Serializabl
             scrollView.setOnBottomReachedListener(null);
             scrollView.setOnScrollListener((OnScrollListener) fileChangeListener);
 
-            if (FILE_CONTENT != null && loaded != null && currentBuffer != null) {
-                restoreDocument();
-            } else {
-                new DocumentLoader().execute();
-            }
+            new DocumentLoader().execute();
         }
     }
 
@@ -225,25 +197,6 @@ public class EditorFragment extends Fragment implements TextWatcher, Serializabl
         contentView.setVisibility(View.VISIBLE);
         contentView.addTextChangedListener(this);
         currentBuffer = contentView.getText().toString();
-
-        if (isFileChangeListenerAttached()) fileChangeListener.onFileOpen();
-    }
-
-    private void restoreDocument() {
-        scrollView.smoothScrollTo(0, 0);
-
-        contentView.setFocusable(false);
-        contentView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                contentView.setFocusableInTouchMode(true);
-            }
-        });
-        contentView.setTextHighlighted(loaded);
-
-        hidden.setVisibility(View.GONE);
-        contentView.setVisibility(View.VISIBLE);
-        contentView.addTextChangedListener(this);
 
         if (isFileChangeListenerAttached()) fileChangeListener.onFileOpen();
     }
