@@ -119,10 +119,6 @@ public class EditorFragment extends Fragment implements TextWatcher {
         return modifiedFileSize;
     }
 
-    public String getFileExtension() {
-        return ExtensionManager.getExtension(file.getName());
-    }
-
     public String getFilePath() {
         return file.getPath();
     }
