@@ -55,8 +55,13 @@ public class CodeEditText extends ShaderEditor {
 
 
         int scrollY = getScrollY();
-        int firstLine = layout.getLineForVertical(scrollY),
-                lastLine = layout.getLineForVertical(scrollY + (getHeight() - getExtendedPaddingTop() - getExtendedPaddingBottom()));
+        int firstLine = layout.getLineForVertical(scrollY), lastLine;
+
+        try {
+            lastLine = layout.getLineForVertical(scrollY + (getHeight() - getExtendedPaddingTop() - getExtendedPaddingBottom()));
+        } catch (NullPointerException npe) {
+            lastLine = layout.getLineForVertical(scrollY + (getHeight() - getPaddingTop() - getPaddingBottom()));
+        }
 
         //canvas.drawRect(0, 0, padding-getPixels(2), layout.getLineBottom(lastLine), bgPaint);
 
