@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.annotation.IntDef;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -13,7 +12,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatCheckBox;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -74,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
                 if (editorFragment != null) {
                     updateProjectStructure(editorFragment.getFilePath());
                     updateNavViews(editorFragment.getFileName(), editorFragment.getFileInfo());
-                    updateExtension(editorFragment.getFileExtension());
+                    updateExtension(editorFragment.getFileName());
                 }
             }
 
@@ -325,36 +323,12 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateExtension(String extension) {
         ImageView extImage = (ImageView) findViewById(R.id.extImage);
-        TextView extText = (TextView) findViewById(R.id.extText);
 
-        if (extImage == null || extText == null)
+        if (extImage == null)
             return;
 
         extImage.setVisibility(View.VISIBLE);
-
-        ExtensionManager.Language language = ExtensionManager.getLanguage(extension);
-
-        if (language == ExtensionManager.Language.NONE) {
-            extImage.setVisibility(View.GONE);
-            extText.setVisibility(View.VISIBLE);
-            extText.setText(extension);
-        } else if (language == ExtensionManager.Language.TEXT) {
-            extImage.setImageResource(R.drawable.vector_txt);
-        } else if (language == ExtensionManager.Language.PYTHON) {
-            extImage.setImageResource(R.drawable.vector_python);
-        } else if (language == ExtensionManager.Language.JAVA) {
-            extImage.setImageResource(R.drawable.vector_java);
-        } else if (language == ExtensionManager.Language.HTML) {
-            extImage.setImageResource(R.drawable.vector_html);
-        } else if (language == ExtensionManager.Language.CSS) {
-            extImage.setImageResource(R.drawable.vector_css);
-        } else if (language == ExtensionManager.Language.PHP) {
-            extImage.setImageResource(R.drawable.vector_php);
-        } else if (language == ExtensionManager.Language.XML) {
-            extImage.setImageResource(R.drawable.vector_xml);
-        } else if (language == ExtensionManager.Language.C) {
-            extImage.setImageResource(R.drawable.vector_cpp);
-        }
+        extImage.setImageResource(ExtensionManager.getIcon(extension));
     }
 
 }
