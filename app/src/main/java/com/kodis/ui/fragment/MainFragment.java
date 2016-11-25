@@ -4,6 +4,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
@@ -195,7 +196,7 @@ public class MainFragment extends Fragment implements FileChangeListener, OnScro
 
     private void openFilePicker() {
         DialogProperties properties = new DialogProperties();
-        properties.selection_mode = DialogConfigs.SINGLE_MODE;
+        properties.selection_mode = DialogConfigs.MULTI_MODE;
         properties.selection_type = DialogConfigs.FILE_SELECT;
         properties.root = new File(DialogConfigs.DEFAULT_DIR);
         properties.extensions = null;
@@ -209,11 +210,14 @@ public class MainFragment extends Fragment implements FileChangeListener, OnScro
                     return;
                 }
 
-                if (isOpen(new File(files[0]))) {
-                    Toast.makeText(getContext(), "File already open", Toast.LENGTH_SHORT).show();
-                    return;
+                for(String filePath : files) {
+                    File file = new File(filePath);
+                    if (isOpen(file)) {
+                        Snackbar.make(rootView, "File " + file.getName() + " already open", Snackbar.LENGTH_SHORT).show();
+                        return;
+                    }
+                    addTab(file);
                 }
-                addTab(files[0]);
             }
         });
         dialog.show();
