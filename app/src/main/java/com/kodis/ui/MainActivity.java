@@ -117,8 +117,6 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_add:
                 addFile();
                 return true;
-            case R.id.action_settings:
-                return true;
         }
 
         return super.onOptionsItemSelected(item);

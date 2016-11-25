@@ -8,9 +8,4 @@
             android:title="New File"
             android:icon="@drawable/vector_add"
             app:showAsAction="always"/>
-    <item
-            android:id="@+id/action_settings"
-            android:title="@string/action_settings"
-            android:orderInCategory="100"
-            app:showAsAction="never"/>
 </menu>
