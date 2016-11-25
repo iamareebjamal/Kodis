@@ -12,7 +12,7 @@ import android.view.ViewTreeObserver;
 
 import java.io.Serializable;
 
-public class CodeEditText extends ShaderEditor implements Serializable {
+public class CodeEditText extends ShaderEditor {
     private Context context;
     private transient Paint paint = new Paint();
     private transient Paint bgPaint = new Paint();

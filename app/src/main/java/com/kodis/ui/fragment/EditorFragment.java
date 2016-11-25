@@ -25,23 +25,23 @@ import com.kodis.utils.ExtensionManager;
 
 import java.io.*;
 
-public class EditorFragment extends Fragment implements TextWatcher, Serializable {
+public class EditorFragment extends Fragment implements TextWatcher {
     public static final String FILE_KEY = "FILE";
 
-    private transient Context context;
+    private Context context;
     private File file;
-    private transient FileChangeListener fileChangeListener;
+    private FileChangeListener fileChangeListener;
 
     private int CHUNK = 20000;
     private String FILE_CONTENT;
     private String currentBuffer;
     private StringBuilder loaded;
 
-    private transient View rootView;
+    private View rootView;
 
-    private transient CodeEditText contentView;
-    private transient View hidden;
-    private transient InteractiveScrollView scrollView;
+    private CodeEditText contentView;
+    private View hidden;
+    private InteractiveScrollView scrollView;
 
     public EditorFragment() {
 
